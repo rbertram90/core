@@ -15,7 +15,9 @@ class FriendFactory extends RBFactory
     protected $fields;
     protected $tableName;
 	
-	// Construct
+    /**
+     * @param rbwebdesigns\core\model\ModelManager $model
+     */
     public function __construct($model)
     {
         // Get connection to database

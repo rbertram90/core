@@ -31,9 +31,12 @@ class RBModel
     protected $tableName;
     protected $fields;
 
-    public function __construct($db, $tableName) {
+    /**
+     * @param rbwebdesigns\core\model\ModelManager $model
+     */
+    public function __construct($model) {
         // These MUST be overridden...
-        $this->db = $db;
+        $this->db = $model->getDatabaseConnection();
         $this->fields = [];
         $this->tblname = $tableName;
     }

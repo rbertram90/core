@@ -16,13 +16,12 @@ class UserFactory extends RBFactory
 	protected $tableName;
 	protected $fields;
 	
-	/**
-	 * @param rbwebdesigns\core\Database $databaseConnection
-	 * @param string $tableName
-	 */
-	public function __construct($databaseConnection, $tableName)
+    /**
+     * @param rbwebdesigns\core\model\ModelManager $model
+     */
+	public function __construct($model)
     {
-		$this->db = $databaseConnection;
+		$this->db = $model->getDatabaseConnection();
         $this->tblname = $tableName;
         $this->fields = array(
             'id' => 'number',
