@@ -10,13 +10,18 @@ namespace rbwebdesigns\core\model;
 
 class Users extends RBModel
 {
-	protected $db, $dbc, $tblname, $fields;
+	protected $db;
+	protected $tableName;
+	protected $fields;
 	
-	// Class Constructor
-	public function __construct($databaseConnection)
+	/**
+	 * @param rbwebdesigns\core\Database $databaseConnection
+	 * @param string $tableName
+	 */
+	public function __construct($databaseConnection, $tableName)
     {
 		$this->db = $databaseConnection;
-        $this->tblname = TBL_USERS;
+        $this->tblname = $tableName;
         $this->fields = array(
             'id' => 'number',
             'name' => 'string',
@@ -134,7 +139,7 @@ class Users extends RBModel
 		
 		try
         {
-			$this->dbc->query("UPDATE ".TBL_USERS." SET password='$md5password' WHERE id='".$_SESSION['userid']."'");
+			$this->db->query("UPDATE ".TBL_USERS." SET password='$md5password' WHERE id='".$_SESSION['userid']."'");
 			
 		} catch(PDOException $e) { die(showQueryError($e)); }
 		
@@ -150,7 +155,7 @@ class Users extends RBModel
 		
 		// Update database
 		try {
-			 $this->dbc->query("UPDATE ".TBL_USERS." SET password='$hashpswd' WHERE id='$user'");
+			 $this->db->query("UPDATE ".TBL_USERS." SET password='$hashpswd' WHERE id='$user'");
 			 
 		} catch(PDOException $e) { die(showQueryError($e)); }
 		
@@ -163,7 +168,7 @@ class Users extends RBModel
     {
 		try
         {
-			$query_recent = $this->dbc->query("SELECT id,name,profile_picture FROM ".TBL_USERS." ORDER BY signup_date DESC LIMIT ".$num);
+			$query_recent = $this->db->query("SELECT id,name,profile_picture FROM ".TBL_USERS." ORDER BY signup_date DESC LIMIT ".$num);
 			
 		} catch(PDOException $e) { die(showQueryError($e)); }
 		

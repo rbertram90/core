@@ -29,17 +29,17 @@ namespace rbwebdesigns\core\model;
     
 **************************************************************************/
 
-class RBModel {
-
+class RBModel
+{
     protected $db;
     protected $tblname;
     protected $fields;
 
-    public function __construct($db) {
+    public function __construct($db, $tableName) {
         // These MUST be overridden...
         $this->db = $db;
-        $this->fields = array();
-        $this->tblname = "";
+        $this->fields = [];
+        $this->tblname = $tableName;
     }
     
     public function getFields() {
