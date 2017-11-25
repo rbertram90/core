@@ -88,7 +88,7 @@ class UserFactory extends RBFactory
         {
 			$query_recent = $this->db->query("SELECT id,name,profile_picture FROM ".TBL_USERS." ORDER BY signup_date DESC LIMIT ".$num);
 			
-		} catch(PDOException $e) { die(showQueryError($e)); }
+		} catch(\PDOException $e) { die(showQueryError($e)); }
 		
 		return $query_recent->fetchAll(PDO::FETCH_ASSOC);
 	}

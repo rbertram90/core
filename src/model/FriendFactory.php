@@ -61,7 +61,7 @@ class FriendFactory extends RBFactory
             $sql.= "LIMIT {$num}";
             
             $getfriends = $this->db->query($sql);
-            $result1 = $getfriends->fetchAll(PDO::FETCH_ASSOC);
+            $result1 = $getfriends->fetchAll(\PDO::FETCH_ASSOC);
             
             $sql = "SELECT {$this->tblusers}.* ";
             $sql.= "FROM {$this->tableName} ";
@@ -71,9 +71,9 @@ class FriendFactory extends RBFactory
             $sql.= "LIMIT {$num}";
             
             $getfriends2 = $this->db->query($sql);
-            $result2 = $getfriends2->fetchAll(PDO::FETCH_ASSOC);
+            $result2 = $getfriends2->fetchAll(\PDO::FETCH_ASSOC);
             
-        } catch(PDOException $e) { die(showQueryError($e)); }
+        } catch(\PDOException $e) { die(showQueryError($e)); }
         
 		return array_merge($result1, $result2);
 	}
@@ -83,9 +83,9 @@ class FriendFactory extends RBFactory
         try {
             $getrequest = $this->db->query("SELECT * FROM ".$this->tableName." WHERE friendid=$id AND confirm=0");
             
-        } catch(PDOException $e) { die(showQueryError($e)); }
+        } catch(\PDOException $e) { die(showQueryError($e)); }
         
-		return $getrequest->fetchAll(PDO::FETCH_ASSOC);
+		return $getrequest->fetchAll(\PDO::FETCH_ASSOC);
 	}
 	
 	public function countFriendRequests($id) {
@@ -94,7 +94,7 @@ class FriendFactory extends RBFactory
 		
             $getrequest = $this->db->query($qs);
 						
-			$results = $getrequest->fetch(PDO::FETCH_ASSOC);
+			$results = $getrequest->fetch(\PDO::FETCH_ASSOC);
 						
 			if(array_key_exists('friendcount', $results)) {
 				return($results['friendcount']);
@@ -102,7 +102,7 @@ class FriendFactory extends RBFactory
 				return 0;
 			}
         }
-		catch(PDOException $e) { die(showQueryError($e)); }
+		catch(\PDOException $e) { die(showQueryError($e)); }
 	}
 	
 	// Get the users which you have asked to be friends
@@ -110,7 +110,7 @@ class FriendFactory extends RBFactory
         try {
             $invites = $this->db->query("SELECT * FROM ".$this->tableName." WHERE userid=$id AND confirm=0");
             
-        } catch(PDOException $e) { die(showQueryError($e)); }
+        } catch(\PDOException $e) { die(showQueryError($e)); }
         
 		return convertToMDArray($invites);
 	}
@@ -120,14 +120,14 @@ class FriendFactory extends RBFactory
         try {
             $check_friend = $this->db->query("SELECT * FROM ".$this->tableName." WHERE (userid='$userid' AND friendid='$friendid') OR (userid='$friendid' AND friendid='$userid')");
             
-        } catch(PDOException $e) { die(showQueryError($e)); }
+        } catch(\PDOException $e) { die(showQueryError($e)); }
 		
         // If friendship doesn't already exist
 		if($check_friend->rowCount() == 0) {
             $date = date("Y-m-d");
             try {
                 $this->db->query("INSERT INTO ".$this->tableName."(userid,friendid,date) VALUES('$userid','$friendid','$date')");
-            } catch(PDOException $e) { die(showQueryError($e)); }
+            } catch(\PDOException $e) { die(showQueryError($e)); }
 			$status = "Friend Added!";
 		}
 		else $status = "Friend already exists!";
@@ -140,7 +140,7 @@ class FriendFactory extends RBFactory
             
 			$results = $query->fetch();
 			
-        } catch(PDOException $e) { die(showQueryError($e)); }
+        } catch(\PDOException $e) { die(showQueryError($e)); }
         
 		return $results[0];
 	}
@@ -150,7 +150,7 @@ class FriendFactory extends RBFactory
         try {
             $this->db->query("UPDATE ".$this->tableName." SET confirm='1' WHERE userid='$friendid' AND friendid='".$_SESSION['userid']."'");
             
-        } catch(PDOException $e) { die(showQueryError($e)); }
+        } catch(\PDOException $e) { die(showQueryError($e)); }
         
 		return showInfo("Friend Confirmed!");
 	}
@@ -160,7 +160,7 @@ class FriendFactory extends RBFactory
         try {
             $this->db->query("DELETE FROM ".$this->tableName." WHERE ((friendid='".$_POST['friend_id']."' AND userid='".$_SESSION['userid']."') OR (userid='".$_POST['friend_id']."' AND friendid='".$_SESSION['userid']."'))");
             
-        } catch(PDOException $e) { die(showQueryError($e)); }
+        } catch(\PDOException $e) { die(showQueryError($e)); }
         
 		return showInfo("Friend Deleted!");
 	}
@@ -170,9 +170,9 @@ class FriendFactory extends RBFactory
         try {
             $getfriends = $this->db->query("SELECT * FROM ".$this->tableName." WHERE (friendid='$friendid' OR userid='$friendid') ORDER by date ASC");
         
-        } catch(PDOException $e) { die(showQueryError($e)); }
+        } catch(\PDOException $e) { die(showQueryError($e)); }
         
-		return $getfriends->fetchAll(PDO::FETCH_ASSOC);
+		return $getfriends->fetchAll(\PDO::FETCH_ASSOC);
 	}
     
     /**
@@ -185,7 +185,7 @@ class FriendFactory extends RBFactory
             
             $query_select_friends_2 = $this->db->query("SELECT userid FROM ".$this->tableName." WHERE (friendid='$id' AND confirm=1)");
         
-        } catch(PDOException $e) { die(showQueryError($e)); }
+        } catch(\PDOException $e) { die(showQueryError($e)); }
         
         $i = $j = 0;
         $fetch_friends_1 = array();
