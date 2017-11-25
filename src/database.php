@@ -62,33 +62,31 @@ class Database
         return $this->db_connection;
     }
 
-    
     /**
-     *   Get the ID number of the last inserted row using PDO standard methods
+     * Get the ID number of the last inserted row using PDO standard methods
      */
-    public function getLastInsertID() {
+    public function getLastInsertID()
+    {
         if(!$this->db_connection) return false;
 
         return $this->db_connection->lastInsertId();
     }
     
-    
     /**
-     *   Run a standard query straight into the database
-     *   (not really the safest way but sometimes necessary!)
+     * Run a standard query straight into the database
+     * (not really the safest way but sometimes necessary!)
      */
-    public function runQuery($psQueryString) {
+    public function query($queryString)
+    {
         if(!$this->db_connection) return false;
 
-        try
-        {
-            $query = $this->db_connection->query($psQueryString);
+        try {
+            $query = $this->db_connection->query($queryString);
         }
         catch(\PDOException $e) {
-            die($this->showSQLError($e, $psQueryString));
+            die($this->showSQLError($e, $queryString));
         }
-		// echo $psQueryString;
-		
+
         return $query;
 	}
     
@@ -96,7 +94,8 @@ class Database
     /**
      *   Format a helpful SQL error message
      */
-    private function showSQLError($err, $psQueryString="") {
+    private function showSQLError($err, $psQueryString="")
+    {
 		if(IS_DEVELOPMENT) {
 			$errMessage = '<p class="error">';
 			$errMessage.= '  <strong>Database Error!</strong><br>';
@@ -112,8 +111,8 @@ class Database
     }
     
     
-    private function prepareSimpleSelect($psDbTable, $pColumnsToSelect, $parrWhere, $strOrderBy, $strLimit) {
-	
+    private function prepareSimpleSelect($psDbTable, $pColumnsToSelect, $parrWhere, $strOrderBy, $strLimit)
+    {
 		// What
         if(gettype($pColumnsToSelect) == 'string') $lsColumnsToSelect = $pColumnsToSelect;  
         else $lsColumnsToSelect = implode(',', $pColumnsToSelect);
@@ -131,33 +130,37 @@ class Database
     }
     
     
-    public function selectSingleRow($psDbTable, $pColumnsToSelect, $parrWhere, $strOrderBy='', $strLimit='') {
+    public function selectSingleRow($psDbTable, $pColumnsToSelect, $parrWhere, $strOrderBy='', $strLimit='')
+    {
         $lsQueryString = $this->prepareSimpleSelect($psDbTable, $pColumnsToSelect, $parrWhere, $strOrderBy, $strLimit);
         // echo $lsQueryString;
-		$query = $this->runQuery($lsQueryString);
+		$query = $this->query($lsQueryString);
         return $query->fetch(\PDO::FETCH_ASSOC);
     }
-    public function selectMultipleRows($psDbTable, $pColumnsToSelect, $parrWhere, $strOrderBy='', $strLimit='') {
+    public function selectMultipleRows($psDbTable, $pColumnsToSelect, $parrWhere, $strOrderBy='', $strLimit='')
+    {
         $lsQueryString = $this->prepareSimpleSelect($psDbTable, $pColumnsToSelect, $parrWhere, $strOrderBy, $strLimit);
-		$query = $this->runQuery($lsQueryString);
+		$query = $this->query($lsQueryString);
         return $query->fetchAll(\PDO::FETCH_ASSOC);
     }
 	
     
-	public function countRows($psDbTable, $parrWhere='') {
+    public function countRows($psDbTable, $parrWhere='')
+    {
         if(getType($parrWhere) == 'array') {
             $querystring = $this->prepareSimpleSelect($psDbTable, 'count(*) as rowcount', $parrWhere, '', '');
         } else {
             $querystring = 'SELECT count(*) as rowcount from '.$psDbTable;
         }
-		$query = $this->runQuery($querystring);
+		$query = $this->query($querystring);
         $result = $query->fetch(\PDO::FETCH_ASSOC);
 		return $result['rowcount'];
 	}
 	
     
 	// Perform a SELECT query that is expected to return ONE result
-    public function select_single($querystring) {
+    public function select_single($querystring)
+    {
     
         try {
             $query = $this->db_connection->query($querystring);
@@ -168,7 +171,8 @@ class Database
     }
 	
     // Perform a SELECT query that will contain 0 or more results
-    public function select_multi($querystring) {
+    public function select_multi($querystring)
+    {
         try {
             $query = $this->db_connection->query($querystring);
         
@@ -184,7 +188,8 @@ class Database
             'timestamp' => '<later'
         ) will only keep the second rule!
     */
-    private function createWhereStatement($parrWhere) {
+    private function createWhereStatement($parrWhere)
+    {
         $i = 0;
         $lsWhere = '';
         foreach($parrWhere as $key => $value):
@@ -231,13 +236,14 @@ class Database
             $lsValues.= $comma.'"'.$value.'"';
         endforeach;
         $lsQueryString = 'INSERT INTO '.$psDbTable.' ('.$lsColumnNames.') VALUES ('.$lsValues.')';
-        return $this->runQuery($lsQueryString);
+        return $this->query($lsQueryString);
     }
     
     /**
         Update a (single) row into the database
     **/
-    public function updateRow($psDbTable, $parrWhere, $parrValues) {
+    public function updateRow($psDbTable, $parrWhere, $parrValues)
+    {
         $i = 0;
         $lsColumnNames = $lsWhere = '';
         foreach($parrValues as $key => $value):
@@ -247,16 +253,17 @@ class Database
         endforeach;
 		$lsWhere = $this->createWhereStatement($parrWhere);
         $lsQueryString = 'UPDATE '.$psDbTable.' SET '.$lsColumnNames.' WHERE '.$lsWhere;		
-        return $this->runQuery($lsQueryString);
+        return $this->query($lsQueryString);
     }
     
     /**
         Delete a row into the database
     **/
-    public function deleteRow($psDbTable, $parrWhere) {
+    public function deleteRow($psDbTable, $parrWhere)
+    {
         $lsWhere = $this->createWhereStatement($parrWhere);
         $lsQueryString = 'DELETE FROM '.$psDbTable.' WHERE '.$lsWhere;
-        return $this->runQuery($lsQueryString);
+        return $this->query($lsQueryString);
     }
 }
 ?>
