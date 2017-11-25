@@ -1,42 +1,49 @@
 <?php
 namespace rbwebdesigns\core;
 
-/******************************************************************
-    Class DB
-    - All low level database access using PHP PDO classes
-    - Select, update, insert and delete functions
-    - Connection to database
-    - All SQL errors caught and handled in consistant way
-    - Limitations/ future improvements:
-        - update and delete only handle WHERE val=this
-        - update, insert and delete will only handle one insert
-        - data needs to be validated and verified before being
-        passed here.
-        - could use prepare statements instead?
-    R.Bertram 27 NOV 2013
-******************************************************************/
+/**
+ * Class DB
+ *   - All low level database access using PHP PDO classes
+ *   - Select, update, insert and delete functions
+ *   - Connection to database
+ *   - All SQL errors caught and handled in consistant way
+ *   - Limitations/ future improvements:
+ *       - update and delete only handle WHERE val=this
+ *       - update, insert and delete will only handle one insert
+ *       - data needs to be validated and verified before being
+ *       passed here.
+ *       - could use prepare statements instead?
+ * @author R.Bertram <ricky@rbwebdesigns.co.uk>
+*/
 
-class Database {
+class Database
+{
+    protected $db_name = '';
+    protected $db_user = '';
+    protected $db_pass = '';
+    protected $db_server = '';
+    private $db_connection = null;
 
-    private $db_name, $db_user, $db_pass, $db_server;
-    private $db_connection;
-
-    /**
-        Construct Database class passing in connection credentials
-    **/
-    public function __construct($psDbServer, $psDbUser, $psDbPass, $psDbName) {
-        $this->db_name = $psDbName;
-        $this->db_user = $psDbUser;
-        $this->db_pass = $psDbPass;
-        $this->db_server = $psDbServer;
-        $this->db_connection = $this->getConnection();
+    public function __construct()
+    {
+        
     }
     
+    public function connect($server, $name, $user, $pass)
+    {
+        $this->db_name = $name;
+        $this->db_user = $user;
+        $this->db_pass = $pass;
+        $this->db_server = $server;
+    }
     
     /**
-        Connect to database using PDO
-    **/
-    public function getConnection() {
+     *   Connect to database using PDO
+     */
+    public function getConnection()
+    {
+        if($this->db_connection !== null) return $this->db_connection;
+
         try {
             // Try to connect
             $db_connect = new \PDO('mysql:host='.$this->db_server.';dbname='.$this->db_name, $this->db_user, $this->db_pass);
@@ -47,23 +54,30 @@ class Database {
         catch(\PDOException $e) {
             die($this->showSQLError($e));
         }
-        return $db_connect;
+
+        $this->db_connection = $db_connect;
+
+        return $this->db_connection;
     }
 
     
     /**
-        Get the ID number of the last inserted row using PDO standard methods
-    **/
+     *   Get the ID number of the last inserted row using PDO standard methods
+     */
     public function getLastInsertID() {
+        if(!$this->db_connection) return false;
+
         return $this->db_connection->lastInsertId();
     }
     
     
     /**
-        Run a standard query straight into the database
-        (not really the safest way but sometimes necessary!)
-    **/
-    public function runQuery($psQueryString) {       
+     *   Run a standard query straight into the database
+     *   (not really the safest way but sometimes necessary!)
+     */
+    public function runQuery($psQueryString) {
+        if(!$this->db_connection) return false;
+
         try
         {
             $query = $this->db_connection->query($psQueryString);
@@ -78,8 +92,8 @@ class Database {
     
     
     /**
-        Format a helpful SQL error message
-    **/
+     *   Format a helpful SQL error message
+     */
     private function showSQLError($err, $psQueryString="") {
 		if(IS_DEVELOPMENT) {
 			$errMessage = '<p class="error">';

@@ -1,21 +1,30 @@
 <?php
 namespace rbwebdesigns\core\model;
 
+use rbwebdesigns\core\Database;
+
 class ModelManager
 {
     protected $models;
-    protected static $instance = null;
+    protected static $instances = [];
+
+    protected $name;
 
     private function __construct()
     {
+        $this->databaseConnection = new Database();
         $this->models = [];
     }
 
-    public static function getInstance() {
-        if(self::$instance == null) {
-            self::$instance = new ModelManager();
+    public static function getInstance($databaseName) {
+        if(array_key_exists($databaseName, self::$instances)) {
+            return self::$instances[$databaseName];
         }
-        return self::$instance;
+        else {
+            self::$instances[$databaseName] = new ModelManager();
+            self::$instances[$databaseName]->name = $databaseName;
+            return self::$instances[$databaseName];
+        }
     }
 
     public function add($key, $model) {
@@ -31,5 +40,12 @@ class ModelManager
             return $this->models[$key];
         }
         return false;
+    }
+
+    /**
+     * @return rbwebdesigns/core/database
+     */
+    public function getDatabaseConnection() {
+        return $this->databaseConnection;
     }
 }
