@@ -25,6 +25,8 @@ class FriendFactory extends RBFactory
         // Get connection to database
         $this->db = $model->getDatabaseConnection();
 
+        $this->clsUsers = $model->get('rbwebdesigns\core\model\UserFactory');
+
 		$this->tableName = 'rbwebdesigns.friends';
         $this->tblusers = 'rbwebdesigns.users';
 
@@ -213,7 +215,6 @@ class FriendFactory extends RBFactory
 		// Need to add friends of people who asked you to be friends
 		$suggestions = array();
 		$i = 0;
-		$gClsUsers = $GLOBALS['gclsUsers'];
 		$friends = $this->getFriendArr($_SESSION['userid']);
 		   
 		// to do: make sure that the suggestion doesn't exists already (might not be confirmed friendship)
@@ -232,7 +233,7 @@ class FriendFactory extends RBFactory
 				// Get the details of the friend of a friend
 				if(!in_array($friend_2_id,$friends) && $friend_2_id != $_SESSION['userid']) {
 				
-					$fetch_details = $gClsUsers->getUserById($friend_2_id);
+					$fetch_details = $this->clsUsers->getUserById($friend_2_id);
 					
 					$suggestions[$i]['image'] = $fetch_details['profile_picture'];
 					$suggestions[$i]['name'] = $fetch_details['name']." ".$fetch_details['surname'];
