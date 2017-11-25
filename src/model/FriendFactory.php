@@ -136,7 +136,7 @@ class FriendFactory extends RBFactory
 	
 	public function countFriends($userid) {
         try {
-            $query = $this->db->query("SELECT count(*) FROM ".$this->tbltableNamename." WHERE (userid=$userid OR friendid=$userid) AND confirm=1");
+            $query = $this->db->query("SELECT count(*) FROM ".$this->tableName." WHERE (userid=$userid OR friendid=$userid) AND confirm=1");
             
 			$results = $query->fetch();
 			
