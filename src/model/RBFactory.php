@@ -1,6 +1,8 @@
 <?php
 namespace rbwebdesigns\core\model;
 
+use rbwebdesigns\core\Sanitize;
+
 /**
  * core/model/RBFactory.php
  * @author: R Bertram <ricky@rbwebdesigns.co.uk>
@@ -31,18 +33,18 @@ class RBFactory
     protected $tableName;
     protected $fields;
 
-    public function __construct($db, $tableName) {
-        // These MUST be overridden...
-        $this->db = $db;
-        $this->fields = [];
-        $this->tblname = $tableName;
+    public function __construct($model)
+    {
+        $this->db = $model->getDatabaseConnection();
     }
     
-    public function getFields() {
+    public function getFields()
+    {
         return $this->fields;
     }
     
-    public function getCount($arrayWhere) {
+    public function getCount($arrayWhere)
+    {
         if(getType($arrayWhere) == 'array') {
             $this->sanitizeFields($arrayWhere);
             return $this->db->countRows($this->tblname, $arrayWhere);
@@ -51,7 +53,8 @@ class RBFactory
         }
     }
     
-    public function get($arrayWhat, $arrayWhere, $order='', $limit='', $multi=true) {
+    public function get($arrayWhat, $arrayWhere, $order='', $limit='', $multi=true)
+    {
         $this->sanitizeFields($arrayWhere);
         if($multi) {
             return $this->db->selectMultipleRows($this->tblname, $arrayWhat, $arrayWhere, $order, $limit);
@@ -60,42 +63,47 @@ class RBFactory
         }
     }
     
-    public function insert($arrayWhat) {
+    public function insert($arrayWhat)
+    {
         $this->sanitizeFields($arrayWhat);
         return $this->db->insertRow($this->tblname, $arrayWhat);
     }
     
-    public function update($arrayWhere, $arrayWhat) {
+    public function update($arrayWhere, $arrayWhat)
+    {
         $this->sanitizeFields($arrayWhat);
         $this->sanitizeFields($arrayWhere);
         return $this->db->updateRow($this->tblname, $arrayWhere, $arrayWhat);
     }
     
-    public function delete($arrayWhere) {
+    public function delete($arrayWhere)
+    {
         return $this->db->deleteRow($this->tblname, $arrayWhere);
     }
     
-    public function sanitizeFields(&$values) {
+    public function sanitizeFields(&$values)
+    {
         foreach($values as $key => $value) {
             $values[$key] = $this->sanitizeField($key, $value);
         }
     }
     
-    public function sanitizeField($fieldkey, $value) {
+    public function sanitizeField($fieldkey, $value)
+    {
         if(array_key_exists($fieldkey, $this->fields)):
             switch($this->fields[$fieldkey]):
                 case "string":
                 case "memo":
-                    return sanitize_string($value);
+                    return Sanitize::string($value);
                     break;
                 case "number":
-                    return sanitize_number($value);
+                    return Sanitize::int($value);
                     break;
                 case "boolean":
-                    return sanitize_boolean($value);
+                    return Sanitize::boolean($value);
                     break;
                 case "datetime":
-                    return sanitize_timestamp($value);
+                    return Sanitize::timestamp($value);
                     break;
             endswitch;
         endif;

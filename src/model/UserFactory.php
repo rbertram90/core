@@ -18,11 +18,13 @@ class UserFactory extends RBFactory
 	
     /**
      * @param rbwebdesigns\core\model\ModelManager $model
+     * 
+     * @todo remove hard coded table names?
      */
 	public function __construct($model)
     {
 		$this->db = $model->getDatabaseConnection();
-        $this->tblname = $tableName;
+        $this->tblname = 'rbwebdesigns.users';
         $this->fields = array(
             'id' => 'number',
             'name' => 'string',

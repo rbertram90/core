@@ -17,13 +17,15 @@ class FriendFactory extends RBFactory
 	
     /**
      * @param rbwebdesigns\core\model\ModelManager $model
+     * 
+     * @todo remove hard coded table names?
      */
     public function __construct($model)
     {
         // Get connection to database
         $this->db = $model->getDatabaseConnection();
 
-		$this->tableName = 'rbwebdesigns.friends'; // needs looking at!
+		$this->tableName = 'rbwebdesigns.friends';
         $this->tblusers = 'rbwebdesigns.users';
 
         $this->fields = [
