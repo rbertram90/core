@@ -1,11 +1,11 @@
 <?php
-namespace rbwebdesigns\core\models;
+namespace rbwebdesigns\core\model;
 
 class ModelManager
 {
     protected $models;
     protected static $instance = null;
-    
+
     private function __construct()
     {
         $this->models = [];
