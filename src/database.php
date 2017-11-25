@@ -36,7 +36,7 @@ class Database
         $this->db_pass = $pass;
         $this->db_server = $server;
 
-        return $this->db_connection;
+        return $this->getConnection();
     }
     
     /**
