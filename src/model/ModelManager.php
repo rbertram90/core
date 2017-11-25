@@ -27,19 +27,17 @@ class ModelManager
         }
     }
 
-    public function add($model) {
-        if(!array_key_exists($model, $this->models)) {
-            $this->models[$model] = new $model($this);
-            return true;
-        }
-        return false;
-    }
-
     public function get($model) {
-        if(array_key_exists($model, $this->models)) {
-            return $this->models[$model];
+        if(!array_key_exists($model, $this->models)) {
+
+            if(!class_exists($model)) {
+                // todo: throw exception
+                return false;
+            }
+
+            $this->models[$model] = new $model($this);
         }
-        return false;
+        return $this->models[$model];
     }
 
     /**
