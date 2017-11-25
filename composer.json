@@ -4,8 +4,8 @@
     {
         "psr-4":
         {
-            "rbwebdesigns\\core": "src",
-            "rbwebdesigns\\core\\model": "src/model"
+            "rbwebdesigns\\core\\": "src",
+            "rbwebdesigns\\core\\model\\": "src/model"
         }
     }
 }
