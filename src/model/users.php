@@ -1,6 +1,8 @@
 <?php
 namespace rbwebdesigns\core\model;
 
+use rbwebdesigns\core\Sanitize;
+
 /**************************************************************************
      class-users.php
      @description provides access the users database
@@ -46,7 +48,7 @@ class Users extends RBModel
 	public function getUserByUsername($strUsername)
     {
 		return $this->db->selectSingleRow(TBL_USERS, '*', array(
-            'username' => safeString($strUsername)
+            'username' => Sanitize::string($strUsername)
         ));
 	}
 	
@@ -54,7 +56,7 @@ class Users extends RBModel
 	public function getUserById($intUserId)
     {
 		return $this->db->selectSingleRow(TBL_USERS, '*', array(
-            'id' => safeNumber($intUserId)
+            'id' => Sanitize::int($intUserId)
         ));
 	}
 	
@@ -62,7 +64,7 @@ class Users extends RBModel
 	public function getUserByEmail($strEmail)
     {
 		return $this->db->selectSingleRow(TBL_USERS, '*', array(
-            'email' => safeString($strEmail)
+            'email' => Sanitize::string($strEmail)
         ));
 	}
     
