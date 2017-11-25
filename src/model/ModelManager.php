@@ -27,17 +27,17 @@ class ModelManager
         }
     }
 
-    public function add($key, $model) {
-        if(!array_key_exists($key, $this->models)) {
-            $this->models[$key] = $model;
+    public function add($model) {
+        if(!array_key_exists($model, $this->models)) {
+            $this->models[$model] = new $model($this);
             return true;
         }
         return false;
     }
 
-    public function get($key) {
-        if(array_key_exists($key, $this->models)) {
-            return $this->models[$key];
+    public function get($model) {
+        if(array_key_exists($model, $this->models)) {
+            return $this->models[$model];
         }
         return false;
     }

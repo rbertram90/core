@@ -1,6 +1,14 @@
 <?php
 namespace rbwebdesigns\core\model;
 
+/**
+ * core/model/FriendFactory.php
+ * @author R Bertram <ricky@rbwebdesigns.co.uk>
+ * 
+ * Uses a pre-defined model instance 'rbwebdesigns' - this
+ * is required to be setup beforehand. Bad practice? Probabily, but is better than other solutions
+ */
+
 class FriendFactory extends RBFactory
 {
     protected $db;
@@ -8,11 +16,12 @@ class FriendFactory extends RBFactory
     protected $tableName;
 	
 	// Construct
-	public function __construct($conn) {
-        // Connection to sample3 database
-        $this->db = $conn->getConnection();
-		
-		$this->tableName = 'rbwebdesigns.friends';
+    public function __construct($model)
+    {
+        // Get connection to database
+        $this->db = $model->getDatabaseConnection();
+
+		$this->tableName = 'rbwebdesigns.friends'; // needs looking at!
         $this->tblusers = 'rbwebdesigns.users';
 
         $this->fields = [
