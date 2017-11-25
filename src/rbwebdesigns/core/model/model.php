@@ -1,4 +1,6 @@
 <?php
+namespace rbwebdesigns\core\model;
+
 /**************************************************************************
     class RBModel
     
@@ -26,8 +28,6 @@
     Author: R.Bertram
     
 **************************************************************************/
-
-namespace rbwebdesigns;
 
 class RBModel {
 

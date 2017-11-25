@@ -2,9 +2,10 @@
     "name": "rbertram90/core",
     "autoload":
     {
-        "psr-0":
+        "psr-4":
         {
-            "rbwebdesigns\\core": "src"
+            "rbwebdesigns\\core": "src",
+            "rbwebdesigns\\core\\model": "src/model"
         }
     }
 }

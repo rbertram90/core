@@ -1,12 +1,12 @@
 <?php
+namespace rbwebdesigns\core\model;
+
 /**************************************************************************
      class-users.php
      @description provides access the users database
      @author R.Bertram
      @date 2013 - Rewritten Jan 2013 to incorporate PDO
 ***************************************************************************/
-
-namespace rbwebdesigns;
 
 class Users extends RBModel
 {

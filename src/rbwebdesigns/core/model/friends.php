@@ -1,5 +1,8 @@
 <?php
-class Friends {
+namespace rbwebdesigns\core\model;
+
+class Friends
+{
     private $db;
 	
 	// Construct
