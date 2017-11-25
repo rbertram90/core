@@ -227,17 +227,17 @@ class FriendFactory extends RBFactory
 			$friend_query_2 = $this->getFriends($friend_id, 5);
 			
 			foreach($friend_query_2 as $friend_2) {
-                
-				$friend_2_id = $friend_2['friendid'];
+
+				$friend_2_id = $friend_2['id'];
 				
 				// Get the details of the friend of a friend
-				if(!in_array($friend_2_id,$friends) && $friend_2_id != $_SESSION['userid']) {
+				if(!in_array($friend_2['id'], $friends) && $friend_2['id'] != $_SESSION['userid']) {
 				
-					$fetch_details = $this->clsUsers->getUserById($friend_2_id);
+					// $fetch_details = $this->clsUsers->getUserById($friend_2_id);
 					
-					$suggestions[$i]['image'] = $fetch_details['profile_picture'];
-					$suggestions[$i]['name'] = $fetch_details['name']." ".$fetch_details['surname'];
-					$suggestions[$i]['id'] = $fetch_details['id'];
+					$suggestions[$i]['image'] = $friend_2['profile_picture'];
+					$suggestions[$i]['name'] = $friend_2['name']." ".$friend_2['surname'];
+					$suggestions[$i]['id'] = $friend_2['id'];
 					$i++;
 				}
 			}
