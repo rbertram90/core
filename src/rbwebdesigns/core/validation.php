@@ -1,4 +1,6 @@
 <?php
+namespace rbwebdesigns\core;
+
 class validate {
 
 	public function __construct() {

@@ -1,5 +1,5 @@
 <?php
-namespace rbwebdesigns;
+namespace rbwebdesigns\core;
 // notes - logins - should we add a session id so that only one session can exist at once
 // only when this function is called will it be reset?
 // - auto logout?

@@ -201,7 +201,7 @@ class Friends {
 			$friend_query_2 = $this->getFriends($friend_id, 5);
 			
 			foreach($friend_query_2 as $friend_2) {
-			
+                
 				$friend_2_id = $friend_2['friendid'];
 				
 				// Get the details of the friend of a friend

@@ -1,4 +1,6 @@
 <?php
+namespace rbwebdesigns\core;
+
 /*
 	$_GET['s'] = page number
 */

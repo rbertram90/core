@@ -1,4 +1,6 @@
 <?php
+namespace rbwebdesigns\core;
+
 class EmailHelper {
 
 	public function __construct() {

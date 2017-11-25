@@ -1,4 +1,5 @@
-<?php namespace rbwebdesigns;
+<?php
+namespace rbwebdesigns\core;
 
 // Want one csrf key for the session which is added to all forms
 

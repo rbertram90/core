@@ -1,0 +1,10 @@
+{
+    "name": "rbertram90/core",
+    "autoload":
+    {
+        "psr-0":
+        {
+            "rbwebdesigns\\core": "src"
+        }
+    }
+}

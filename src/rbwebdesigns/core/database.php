@@ -1,5 +1,5 @@
 <?php
-namespace rbwebdesigns;
+namespace rbwebdesigns\core;
 
 /******************************************************************
     Class DB
@@ -16,7 +16,7 @@ namespace rbwebdesigns;
     R.Bertram 27 NOV 2013
 ******************************************************************/
 
-class DB {
+class Database {
 
     private $db_name, $db_user, $db_pass, $db_server;
     private $db_connection;

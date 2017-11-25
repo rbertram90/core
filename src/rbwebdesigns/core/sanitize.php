@@ -1,24 +1,4 @@
 <?php
-// DEPRECATED FUNCTIONS - here because they've been used EVERYWHERE!
-// Sanitize a string
-function safeString($str) {
-	return filter_var($str,FILTER_SANITIZE_STRING);
-}
-// Sanitize a number
-function safeNumber($num) {
-	return filter_var($num,FILTER_SANITIZE_NUMBER_INT);
-}
-// Sanitize a floating point number
-function safeFloat($num) {
-	return filter_var($num,FILTER_SANITIZE_NUMBER_FLOAT);
-}
-// Sanitize an Email address
-function safeEmail($email) {
-	return filter_var($email,FILTER_SANITIZE_EMAIL);
-}
-
-// NEW Replacement Functions
-
 // Sanitize a string
 function sanitize_string($str) {
 	return filter_var($str, FILTER_SANITIZE_STRING);

@@ -1,5 +1,5 @@
 <?php
-namespace rbwebdesigns;
+namespace rbwebdesigns\core;
 
 class JSONhelper
 {
