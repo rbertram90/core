@@ -3,18 +3,27 @@ namespace rbwebdesigns\core\model;
 
 class FriendFactory extends RBFactory
 {
-    private $db;
+    protected $db;
+    protected $fields;
+    protected $tableName;
 	
 	// Construct
 	public function __construct($conn) {
         // Connection to sample3 database
         $this->db = $conn->getConnection();
 		
-		$this->tblname = 'rbwebdesigns.friends';
+		$this->tableName = 'rbwebdesigns.friends';
         $this->tblusers = 'rbwebdesigns.users';
+
+        $this->fields = [
+            'userid' => 'number',
+            'friendid' => 'number',
+            'confirm' => 'boolean',
+            'date' => 'string' // @todo don't have a date (no time) only format?
+        ];
 	}
 	
-    public function isFriend($user,$friend) {
+    public function isFriend($user, $friend) {
         try {
             $getfriends = $this->db->query("SELECT COUNT(*) FROM ".FRIENDS." WHERE ((userid=$user AND friendid=$friend) OR (userid=$friend AND friendid=$user)) AND confirm=1");
             
@@ -32,8 +41,8 @@ class FriendFactory extends RBFactory
 	public function getFriends($id, $num = 10) {
         try {
             $sql = "SELECT {$this->tblusers}.* ";
-            $sql.= "FROM {$this->tblname} ";
-            $sql.= "LEFT JOIN {$this->tblusers} ON {$this->tblname}.userid = {$this->tblusers}.id ";
+            $sql.= "FROM {$this->tableName} ";
+            $sql.= "LEFT JOIN {$this->tblusers} ON {$this->tableName}.userid = {$this->tblusers}.id ";
             $sql.= "WHERE userid={$id} ";
             $sql.= "AND confirm=1 ";
             $sql.= "LIMIT {$num}";
@@ -42,8 +51,8 @@ class FriendFactory extends RBFactory
             $result1 = $getfriends->fetchAll(PDO::FETCH_ASSOC);
             
             $sql = "SELECT {$this->tblusers}.* ";
-            $sql.= "FROM {$this->tblname} ";
-            $sql.= "LEFT JOIN {$this->tblusers} ON {$this->tblname}.userid = {$this->tblusers}.id ";
+            $sql.= "FROM {$this->tableName} ";
+            $sql.= "LEFT JOIN {$this->tblusers} ON {$this->tableName}.userid = {$this->tblusers}.id ";
             $sql.= "WHERE friendid={$id} ";
             $sql.= "AND confirm=1 ";
             $sql.= "LIMIT {$num}";
@@ -59,7 +68,7 @@ class FriendFactory extends RBFactory
 	// Get the people who have requested your friendship
 	public function getFriendRequests($id) {
         try {
-            $getrequest = $this->db->query("SELECT * FROM ".$this->tblname." WHERE friendid=$id AND confirm=0");
+            $getrequest = $this->db->query("SELECT * FROM ".$this->tableName." WHERE friendid=$id AND confirm=0");
             
         } catch(PDOException $e) { die(showQueryError($e)); }
         
@@ -68,7 +77,7 @@ class FriendFactory extends RBFactory
 	
 	public function countFriendRequests($id) {
         try {
-			$qs = "SELECT count(*) as friendcount FROM ".$this->tblname." WHERE friendid=$id AND confirm=0";
+			$qs = "SELECT count(*) as friendcount FROM ".$this->tableName." WHERE friendid=$id AND confirm=0";
 		
             $getrequest = $this->db->query($qs);
 						
@@ -86,7 +95,7 @@ class FriendFactory extends RBFactory
 	// Get the users which you have asked to be friends
 	public function getInvites($id) {
         try {
-            $invites = $this->db->query("SELECT * FROM ".$this->tblname." WHERE userid=$id AND confirm=0");
+            $invites = $this->db->query("SELECT * FROM ".$this->tableName." WHERE userid=$id AND confirm=0");
             
         } catch(PDOException $e) { die(showQueryError($e)); }
         
@@ -96,7 +105,7 @@ class FriendFactory extends RBFactory
 	// Add a new friend
 	public function addFriend($userid,$friendid) {
         try {
-            $check_friend = $this->db->query("SELECT * FROM ".$this->tblname." WHERE (userid='$userid' AND friendid='$friendid') OR (userid='$friendid' AND friendid='$userid')");
+            $check_friend = $this->db->query("SELECT * FROM ".$this->tableName." WHERE (userid='$userid' AND friendid='$friendid') OR (userid='$friendid' AND friendid='$userid')");
             
         } catch(PDOException $e) { die(showQueryError($e)); }
 		
@@ -104,7 +113,7 @@ class FriendFactory extends RBFactory
 		if($check_friend->rowCount() == 0) {
             $date = date("Y-m-d");
             try {
-                $this->db->query("INSERT INTO ".$this->tblname."(userid,friendid,date) VALUES('$userid','$friendid','$date')");
+                $this->db->query("INSERT INTO ".$this->tableName."(userid,friendid,date) VALUES('$userid','$friendid','$date')");
             } catch(PDOException $e) { die(showQueryError($e)); }
 			$status = "Friend Added!";
 		}
@@ -114,7 +123,7 @@ class FriendFactory extends RBFactory
 	
 	public function countFriends($userid) {
         try {
-            $query = $this->db->query("SELECT count(*) FROM ".$this->tblname." WHERE (userid=$userid OR friendid=$userid) AND confirm=1");
+            $query = $this->db->query("SELECT count(*) FROM ".$this->tbltableNamename." WHERE (userid=$userid OR friendid=$userid) AND confirm=1");
             
 			$results = $query->fetch();
 			
@@ -126,7 +135,7 @@ class FriendFactory extends RBFactory
 	// Accept a recieved friend invitation
 	public function acceptFriend($friendid) {
         try {
-            $this->db->query("UPDATE ".$this->tblname." SET confirm='1' WHERE userid='$friendid' AND friendid='".$_SESSION['userid']."'");
+            $this->db->query("UPDATE ".$this->tableName." SET confirm='1' WHERE userid='$friendid' AND friendid='".$_SESSION['userid']."'");
             
         } catch(PDOException $e) { die(showQueryError($e)); }
         
@@ -136,7 +145,7 @@ class FriendFactory extends RBFactory
 	// Delete a current friendship
 	public function deleteFriend() {
         try {
-            $this->db->query("DELETE FROM ".$this->tblname." WHERE ((friendid='".$_POST['friend_id']."' AND userid='".$_SESSION['userid']."') OR (userid='".$_POST['friend_id']."' AND friendid='".$_SESSION['userid']."'))");
+            $this->db->query("DELETE FROM ".$this->tableName." WHERE ((friendid='".$_POST['friend_id']."' AND userid='".$_SESSION['userid']."') OR (userid='".$_POST['friend_id']."' AND friendid='".$_SESSION['userid']."'))");
             
         } catch(PDOException $e) { die(showQueryError($e)); }
         
@@ -146,7 +155,7 @@ class FriendFactory extends RBFactory
 	// Get a friends 'recently' formed friendships
 	public function getRecentFriends($friendid) {
         try {
-            $getfriends = $this->db->query("SELECT * FROM ".$this->tblname." WHERE (friendid='$friendid' OR userid='$friendid') ORDER by date ASC");
+            $getfriends = $this->db->query("SELECT * FROM ".$this->tableName." WHERE (friendid='$friendid' OR userid='$friendid') ORDER by date ASC");
         
         } catch(PDOException $e) { die(showQueryError($e)); }
         
@@ -159,9 +168,9 @@ class FriendFactory extends RBFactory
      */
     function getFriendArr($id) {
         try {
-            $query_select_friends_1 = $this->db->query("SELECT friendid FROM ".$this->tblname." WHERE (userid='$id' AND confirm=1)");
+            $query_select_friends_1 = $this->db->query("SELECT friendid FROM ".$this->tableName." WHERE (userid='$id' AND confirm=1)");
             
-            $query_select_friends_2 = $this->db->query("SELECT userid FROM ".$this->tblname." WHERE (friendid='$id' AND confirm=1)");
+            $query_select_friends_2 = $this->db->query("SELECT userid FROM ".$this->tableName." WHERE (friendid='$id' AND confirm=1)");
         
         } catch(PDOException $e) { die(showQueryError($e)); }
         

@@ -28,7 +28,7 @@ namespace rbwebdesigns\core\model;
 class RBModel
 {
     protected $db;
-    protected $tblname;
+    protected $tableName;
     protected $fields;
 
     public function __construct($db, $tableName) {
