@@ -10,7 +10,7 @@ use rbwebdesigns\core\Sanitize;
      @date 2013 - Rewritten Jan 2013 to incorporate PDO
 ***************************************************************************/
 
-class Users extends RBModel
+class UserFactory extends RBFactory
 {
 	protected $db;
 	protected $tableName;
@@ -45,7 +45,7 @@ class Users extends RBModel
 	}
 
 	// Get user by username
-	public function getUserByUsername($strUsername)
+	public function getByUsername($strUsername)
     {
 		return $this->db->selectSingleRow(TBL_USERS, '*', array(
             'username' => Sanitize::string($strUsername)
@@ -53,7 +53,7 @@ class Users extends RBModel
 	}
 	
 	// Get user by id
-	public function getUserById($intUserId)
+	public function getById($intUserId)
     {
 		return $this->db->selectSingleRow(TBL_USERS, '*', array(
             'id' => Sanitize::int($intUserId)
@@ -61,14 +61,14 @@ class Users extends RBModel
 	}
 	
 	// Get user by email address
-	public function getUserByEmail($strEmail)
+	public function getByEmail($strEmail)
     {
 		return $this->db->selectSingleRow(TBL_USERS, '*', array(
             'email' => Sanitize::string($strEmail)
         ));
 	}
     
-    public function findUserByUsername($username)
+    public function searchByUsername($username)
     {
         return $this->db->selectMultipleRows(TBL_USERS, '*', 'username LIKE "%' . $username . '%"');
     }
@@ -78,91 +78,6 @@ class Users extends RBModel
     {
         $arrWhat = array('id', 'username', 'signup_date', 'profile_picture');
         return $this->db->selectMultipleRows(TBL_USERS, $arrWhat, $arrWhere);
-	}
-	
-	// Delete a user
-	public function deleteAccount($id)
-    {
-		try
-        {
-			// Query Database
-			$this->db->query("DELETE FROM ".TBL_USERS." WHERE id=".$id, $this->db);
-			
-		} catch(PDOException $e) { die(showQueryError($e)); }
-        
-		// Logout
-		session_destroy();
-		
-		// Redirect to homepage
-		header("Location: index.php");
-	}
-	
-	// Update the details of an account
-	public function updateDetails($fields)
-    {
-		// Loop through all values in the array fields adding them to the SQL WHERE string
-		$sql_set_clause = "";
-		foreach($fields as $key=> $value)
-        {
-			$sql_set_clause .= " $key='$value',";
-		}
-		
-		// Remove the final unwanted comma
-		$sql_set_clause = substr($sql_set_clause,0,-1);
-		
-		try {
-			$this->db->runQuery("UPDATE ".TBL_USERS." SET $sql_set_clause WHERE id='".$_SESSION['userid']."'");
-			
-		} catch(PDOException $e) { die(showQueryError($e)); }
-		        
-		return true;
-	}
-
-	// Stage 1 for password update
-	public function updatePassword($details)
-    {
-		// Check the repeated passwords match
-		if($details['new_password'] != $details['new_password_rpt'])
-        {
-			echo showError("Password do not match!");
-			return;
-		}
-		
-		$lobjUser = $this->getUserById($_SESSION['userid']);
-		
-		// Check the given password matches the database
-		if(md5($details['current_password']) != $lobjUser['password'])
-        {
-			echo showError("Existing password didn't match!");
-			return;
-		}
-		
-		$md5password = md5($details['new_password']);
-		
-		try
-        {
-			$this->db->query("UPDATE ".TBL_USERS." SET password='$md5password' WHERE id='".$_SESSION['userid']."'");
-			
-		} catch(PDOException $e) { die(showQueryError($e)); }
-		
-		return true;
-	}
-	
-	// Password reset request submitted
-	public function resetPassword($user)
-    {
-		// Generate a password
-		$newpswd = generateRandomAlphaNumeric(8);
-		$hashpswd = md5($newpswd);
-		
-		// Update database
-		try {
-			 $this->db->query("UPDATE ".TBL_USERS." SET password='$hashpswd' WHERE id='$user'");
-			 
-		} catch(PDOException $e) { die(showQueryError($e)); }
-		
-		// Return the new password
-		return $newpswd;
 	}
 	
 	// Get the last $num most recent members
@@ -205,4 +120,3 @@ class Users extends RBModel
 	}
 */
 }
-?>

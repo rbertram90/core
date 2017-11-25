@@ -1,7 +1,7 @@
 <?php
 namespace rbwebdesigns\core\model;
 
-class Friends
+class FriendFactory extends RBFactory
 {
     private $db;
 	
