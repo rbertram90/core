@@ -15,6 +15,13 @@ class Session
     public $currentUser = null;
 
     /**
+     * Start the session
+     */
+    public function __construct() {
+        session_start();
+    }
+
+    /**
      * Get a session variable
      * @param string $name
      * @param mixed $default
@@ -35,4 +42,44 @@ class Session
         $_SESSION[$name] = $value;
     }
 
+
+    /**
+     * Add flash message
+     */
+    public function addMessage($message)
+    {
+        if(!isset($_SESSION['messagetoshow'])) $_SESSION['messagetoshow'] = [];
+
+        $_SESSION['messagetoshow'][] = $message;
+    }
+
+    /**
+     * Get & remove the first message
+     */
+    public function getMessage()
+    {
+        // Return false if no messages
+        if(!isset($_SESSION['messagetoshow']) || count($_SESSION['messagetoshow']) == 0) return false;
+
+        // Return first element of messages array
+        return array_shift($_SESSION['messagetoshow']);
+    }
+
+    /**
+     * Get all messages & empty
+     */
+    public function getAllMessages()
+    {
+        // Check variable exists
+        if(!isset($_SESSION['messagetoshow'])) $_SESSION['messagetoshow'] = [];
+
+        // Store in temp variable
+        $messages = $_SESSION['messagetoshow'];
+
+        // Clear all messages
+        $_SESSION['messagetoshow'] = [];
+
+        // Return cached
+        return $messages;
+    }
 }
