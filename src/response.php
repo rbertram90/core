@@ -26,9 +26,9 @@ class Response
     }
 
     /**
-     * Output a template
+     * Output page template
      */
-    public function render($templatePath)
+    public function writeTemplate($templatePath)
     {
         global $session;
 
@@ -38,6 +38,17 @@ class Response
         $currentUser = $session->currentUser;
         $messages = $session->getAllMessages();
 
+        foreach($this->variables as $name => $value) {
+            $$name = $value;
+        }
+
+        require $templatePath;
+    }
+
+    /**
+     * Output content template
+     */
+    public function write($templatePath) {
         foreach($this->variables as $name => $value) {
             $$name = $value;
         }
