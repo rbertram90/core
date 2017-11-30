@@ -1,6 +1,8 @@
 <?php
 namespace rbwebdesigns\core;
 
+use rbwebdesigns\core\Session;
+
 /**********************************************************
     core/response.php
     
@@ -123,5 +125,20 @@ class Response
         }
 
         return $styleMarkup;
+    }
+
+    /**
+     * Redirect elsewhere with optional message
+     * @param string $location
+     * @param string $message
+     * @param string $messageType
+     */
+    public function redirect($location, $message = '', $messageType = 'info') {
+        if(strlen($message) > 0) {
+            Session::addMessage($message, $messageType);
+        }
+        session_write_close();
+        header('Location: ' . $location);
+        exit;
     }
 }

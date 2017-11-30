@@ -46,17 +46,20 @@ class Session
     /**
      * Add flash message
      */
-    public function addMessage($message)
+    public static function addMessage($message, $type='info')
     {
         if(!isset($_SESSION['messagetoshow'])) $_SESSION['messagetoshow'] = [];
 
-        $_SESSION['messagetoshow'][] = $message;
+        $_SESSION['messagetoshow'][] = [
+            'text' => $message,
+            'type' => $type
+        ];
     }
 
     /**
      * Get & remove the first message
      */
-    public function getMessage()
+    public static function getMessage()
     {
         // Return false if no messages
         if(!isset($_SESSION['messagetoshow']) || count($_SESSION['messagetoshow']) == 0) return false;
@@ -68,7 +71,7 @@ class Session
     /**
      * Get all messages & empty
      */
-    public function getAllMessages()
+    public static function getAllMessages()
     {
         // Check variable exists
         if(!isset($_SESSION['messagetoshow'])) $_SESSION['messagetoshow'] = [];

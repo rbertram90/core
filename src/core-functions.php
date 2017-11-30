@@ -37,7 +37,7 @@ function printArray($pArray) {
 
 function setSystemMessage($message, $ptype = "Info") {
 	$fn = "show".$ptype;
-	$_SESSION['messagetoshow'] = $fn(safeString($message));
+	$_SESSION['messagetoshow'] = $fn($message);
 	session_write_close(); // Fix for session var not being saved
 }
 function redirect($location) {
