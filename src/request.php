@@ -1,19 +1,20 @@
 <?php
 namespace rbwebdesigns\core;
 
-/**********************************************************
-    core/request.php
-    
-    Functions
-        $request->getString('name', 'Hello world');
-        $request->getInt('age', 21);
-    
-**********************************************************/
-
+/**
+ * core/Request.php
+ * @author R Bertram <ricky@rbwebdesigns.co.uk>
+ * 
+ * Documentation:
+ * https://github.com/rbertram90/core/wiki/Request
+ */
 class Request
 {
+
     protected $urlParameters;
     protected $controller;
+
+    public $isAjax = false;
 
     /**
      * Requests are routed for pretty urls

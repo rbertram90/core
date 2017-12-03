@@ -29,6 +29,9 @@ namespace rbwebdesigns\core;
  * @method PDOStatement updateRow($tableName, $where, $values)
  * @method PDOStatement deleteRow($tableName, $where)
  * 
+ * Documentation:
+ * https://github.com/rbertram90/core/wiki/Database
+ * 
  * @author R.Bertram <ricky@rbwebdesigns.co.uk>
 */
 class Database

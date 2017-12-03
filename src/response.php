@@ -3,14 +3,13 @@ namespace rbwebdesigns\core;
 
 use rbwebdesigns\core\Session;
 
-/**********************************************************
-    core/response.php
-    
-    Functions
-        $response->setVar('variableName', value);
-    
-**********************************************************/
-
+/**
+ * core/response.php
+ * @author R Bertram <ricky@rbwebdesigns.co.uk>
+ * 
+ * Documentation:
+ * https://github.com/rbertram90/core/wiki/Response
+ */
 class Response
 {
 
@@ -79,6 +78,13 @@ class Response
      */
     public function setBody($output) {
         $this->body = $output;
+    }
+
+    /**
+     * Quick get out of jail free card where page template is not used
+     */
+    public function writeBody() {
+        print $this->body;
     }
 
     /**
