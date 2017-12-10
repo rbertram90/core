@@ -20,9 +20,14 @@ class Request
      * Requests are routed for pretty urls
      * xyz.com/controller/action/data => xyz.com?p=controller&query=action/data
      */
-    public function __construct()
+    public function __construct($options = [])
     {
-        $this->controller = $this->getInt('p', 0);
+        $controllerKey = 'p';
+        if(array_key_exists('controllerKey', $options)) {
+            $controllerKey = $options['controllerKey'];
+        }
+
+        $this->controller = $this->getString($controllerKey, 0);
         $this->urlParameters = explode('/', $this->getString('query'));
     }
 
