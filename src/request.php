@@ -62,7 +62,16 @@ class Request
     }
 
     /**
+     * @return string controller class name
+     */
+    public function getControllerName()
+    {
+        return $this->controller;
+    }
+
+    /**
      * @param int $index
+     * @return mixed url parameter value
      */
     public function getUrlParameter($index, $default = false)
     {
