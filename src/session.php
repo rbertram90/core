@@ -19,6 +19,9 @@ class Session
      */
     public function __construct() {
         session_start();
+        if(array_key_exists('user', $_SESSION)) {
+            $this->currentUser = $_SESSION['user'];
+        }
     }
 
     /**
@@ -42,6 +45,21 @@ class Session
         $_SESSION[$name] = $value;
     }
 
+    /**
+     * Unset a session variable
+     */
+    public function unset($name)
+    {
+        unset($_SESSION[$name]);
+    }
+
+    /**
+     * Destroy the session
+     */
+    public function end()
+    {
+        session_destroy();
+    }
 
     /**
      * Add flash message

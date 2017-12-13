@@ -43,18 +43,34 @@ class Response
             $$name = $value;
         }
 
-        require $templatePath;
+        if(!file_exists($templatePath)) {
+            $debug = print_r(debug_backtrace(), true);
+            die('Unable to find template: ' . $templatePath . '<pre>' . $debug . '</pre>'); // todo - create a proper debug class
+        }
+        else {
+            require $templatePath;
+        }
     }
 
     /**
      * Output content template
      */
     public function write($templatePath) {
+        global $session;
+
+        $currentUser = $session->currentUser;
+        
         foreach($this->variables as $name => $value) {
             $$name = $value;
         }
 
-        require $templatePath;
+        if(!file_exists($templatePath)) {
+            $debug = print_r(debug_backtrace(), true);
+            die('Unable to find template: ' . $templatePath . '<pre>' . $debug . '</pre>'); // todo - create a proper debug class
+        }
+        else {
+            require $templatePath;
+        }
     }
 
     /**
@@ -146,5 +162,12 @@ class Response
         session_write_close();
         header('Location: ' . $location);
         exit;
+    }
+
+    /**
+     * Set a response header
+     */
+    public function addHeader($name, $value) {
+        header("{$name}: {$value}");
     }
 }

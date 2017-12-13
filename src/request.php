@@ -26,7 +26,7 @@ class Request
         if(array_key_exists('controllerKey', $options)) {
             $controllerKey = $options['controllerKey'];
         }
-
+        
         $this->controller = $this->getString($controllerKey, 0);
         $this->urlParameters = explode('/', $this->getString('query'));
     }
