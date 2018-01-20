@@ -237,16 +237,34 @@ class Database
      */
     public function insertRow($tableName, $values)
     {
-        $i = $j = 0;
+        if(!$this->db_connection) return false;
+        
+        $i = 0;
         $columnNames = $valuesString = '';
 
         foreach($values as $key => $value) {
-            $comma = ($i == 0) ? '': ','; $i++;
+            $comma = ($i == 0) ? '': ', ';
+            $i++;
             $columnNames.= $comma.'`'.$key.'`';
-            $valuesString.= $comma.'"'.$value.'"';
+            $valuesString.= $comma.'?';
         }
 
-        return $this->query('INSERT INTO '.$tableName.' ('.$columnNames.') VALUES ('.$valuesString.')');
+        $queryString = 'INSERT INTO ' . $tableName . ' (' . $columnNames . ') VALUES (' . $valuesString . ')';
+        
+        try {
+            $statement = $this->db_connection->prepare($queryString);
+            
+            $j = 1;
+            foreach($values as $value) {
+                $statement->bindValue($j, $value);
+                $j++;
+            }
+            
+            return $statement->execute();
+        }
+        catch(\PDOException $e) {
+            die($this->showSQLError($e, $queryString));
+        }
     }
     
     /**
@@ -259,7 +277,7 @@ class Database
 
         foreach($values as $key => $value) {
             $comma = ($i == 0) ? '': ',';
-            $lsColumnNames.= $comma.' `'.$key.'`="'.$value.'"';
+            $columnNames.= $comma.' `'.$key.'`="'.$value.'"';
 			$i++;
         }
 
