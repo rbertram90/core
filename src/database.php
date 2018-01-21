@@ -12,18 +12,22 @@ namespace rbwebdesigns\core;
  *         passed here.
  *       - could use prepare statements instead?
  * 
- * @method PDO connect(string $server, string $name, string $user, string $password) Supply connection
- *  information and get database connection object in return
- * @method PDO getConnection() Get the current database connection object - connect() must have already
- *  been called
- * @method int getLastInsertID() This has limited use as a public method as needs to be called within
- *  transaction
- * @method PDOStatement query($queryString) Run raw sql - recommended to use the helper functions for
- *  simple queries and this for more complicated ones 
+ * @method PDO connect(string $server, string $name, string $user, string $password)
+ *  Supply connection information and get database connection object in return
+ * @method PDO getConnection()
+ *  Get the current database connection object - connect() must have already been called
+ * @method int getLastInsertID()
+ *  This has limited use as a public method as needs to be called within transaction
+ * @method PDOStatement query(string $queryString)
+ *  Run raw sql - recommended to use the helper functions for simple queries and this for more complicated ones
+ * @method bool runPreparedStatement(string $queryString, array $values)
+ *  Run prepared statement SQL (that is already formatted with placeholders) with $values to pass through.
+ *  Returns the result of the execution
  * @method array selectSingleRow(string $tableName, array/string $columnsToSelect, array $where, string $strOrderBy='', string $strLimit='')
  *  Select a single row from database
  * @method array selectMultipleRows(string $tableName, array/string $columnsToSelect, array $where, string $strOrderBy='', string $strLimit='')
  *  Select multiple rows from database
+ * @method array selectAllRows(string $tableName, array/string $columnsToSelect, string $strOrderBy='')
  * @method int countRows(string $tableName, array $where='') Get a row count for conditions
  * @method PDOStatement insertRow($tableName, $values)
  * @method PDOStatement updateRow($tableName, $where, $values)
@@ -92,7 +96,8 @@ class Database
     
     /**
      * Run a standard query straight into the database
-     * (not really the safest way but sometimes necessary!)
+     * ideally shouldn't be called from outside this class,
+     * but sometimes necessary for complex queries.
      * 
      * @return PDOStatement
      */
@@ -108,26 +113,61 @@ class Database
         }
 
         return $query;
-	}
+    }
     
+    /**
+     * Query the database using a prepared statement - much
+     * safer than query.
+     * 
+     * @param string $queryString
+     *   SQL string with placeholders for values
+     * @param array $values
+     *   if the keys of the array are named then these will be used as
+     *   placeholder names.
+     */
+    public function runPreparedStatement($queryString, $values)
+    {
+        if(!$this->db_connection) return false;
+
+        try {
+            $statement = $this->db_connection->prepare($queryString);
+            
+            $j = 1;
+            foreach($values as $key => $value) {
+                if($key == $j-1) {
+                    $statement->bindValue($j, $value);
+                }
+                else {
+                    $statement->bindValue(':' . $key, $value);
+                }
+                $j++;
+            }
+            
+            return $statement->execute();
+        }
+        catch(\PDOException $e) {
+            die($this->showSQLError($e, $queryString));
+        }
+    }
     
     /**
      * Format a helpful SQL error message
      * 
-     * @todo change IS_DEVELOPMENT flag
+     * @todo re-consider IS_DEVELOPMENT flag - ENV variable?
      */
-    private function showSQLError($err, $psQueryString="")
+    private function showSQLError($err, $queryString="")
     {
-		if(IS_DEVELOPMENT) {
+		if(is_defined(IS_DEVELOPMENT) && IS_DEVELOPMENT) {
 			$errMessage = '<p class="error">';
 			$errMessage.= '  <strong>Database Error!</strong><br>';
-			$errMessage.= '  Details: '.$err->getMessage().'<br>';
-			$errMessage.= '  File: <strong>'.$err->getFile().'</strong><br>';
-			$errMessage.= '  Line: <strong>'.$err->getLine().'</strong><br>';
-			if(strlen($psQueryString) > 0) $errMessage.= 'SQL: <strong>'.$psQueryString.'</strong>';
+			$errMessage.= '  Details: ' . $err->getMessage() . '<br>';
+			$errMessage.= '  File: <strong>' . $err->getFile() . '</strong><br>';
+			$errMessage.= '  Line: <strong>' . $err->getLine() . '</strong><br>';
+			if(strlen($queryString) > 0) $errMessage.= 'SQL: <strong>' . $queryString . '</strong>';
 			$errMessage.= '</p>';
-		} else {
-			$errMessage = 'Oh No! Something has gone wrong, please contact support regarding a database error!';
+        }
+        else {
+			$errMessage = '<p>Oh No! Something has gone wrong, please contact support regarding a database error!</p>';
 		}
         return $errMessage;
     }
@@ -135,30 +175,30 @@ class Database
     /**
      * Does the grunt work for select
      */
-    private function prepareSimpleSelect($tableName, $pColumnsToSelect, $parrWhere, $strOrderBy, $strLimit)
+    private function prepareSimpleSelect($tableName, $columnsToSelect, $where, $orderBy, $limit)
     {
-		// What
-        if(gettype($pColumnsToSelect) == 'string') $lsColumnsToSelect = $pColumnsToSelect;  
-        else $lsColumnsToSelect = implode(',', $pColumnsToSelect);
+		// Columns to fetch
+        if(is_array($columnsToSelect)) $columnsToSelect = implode(',', $columnsToSelect);
         
-		if(gettype($parrWhere) == 'string') $psWhere = ' ' . $parrWhere;
-        else $psWhere = $this->createWhereStatement($parrWhere);
+        // Conditions
+        if(is_array($where)) $where = $this->createWhereStatement($where);
+        else $where = ' ' . $where;
         
 		// Order
-		if(strlen($strOrderBy) > 0) $strOrderBy = ' ORDER BY '.$strOrderBy;
+		if(strlen($orderBy) > 0) $orderBy = ' ORDER BY ' . $orderBy;
 		
 		// Limit
-		if(strlen($strLimit) > 0) $strLimit = ' LIMIT '.$strLimit;
+		if(strlen($limit) > 0) $limit = ' LIMIT ' . $limit;
 	
-        return 'SELECT '.$lsColumnsToSelect.' FROM '.$tableName.' WHERE '.$psWhere.$strOrderBy.$strLimit;
+        return 'SELECT '.$columnsToSelect.' FROM '.$tableName.' WHERE '.$where.$orderBy.$limit;
     }
     
     /**
      * Select a single row from database
      */
-    public function selectSingleRow($tableName, $columns, $parrWhere, $strOrderBy='', $strLimit='')
+    public function selectSingleRow($tableName, $columns, $where, $orderBy='', $limit='')
     {
-        $queryString = $this->prepareSimpleSelect($tableName, $columns, $parrWhere, $strOrderBy, $strLimit);
+        $queryString = $this->prepareSimpleSelect($tableName, $columns, $where, $orderBy, $limit);
 		$query = $this->query($queryString);
         return $query->fetch(\PDO::FETCH_ASSOC);
     }
@@ -171,6 +211,18 @@ class Database
         $queryString = $this->prepareSimpleSelect($tableName, $columns, $where, $orderBy, $limit);
 		$query = $this->query($queryString);
         return $query->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Select all rows from a table in the database
+     * 
+     * @param string $tableName
+     * @param mixed $columns
+     * @param string $orderBy
+     */
+    public function selectAllRows($tableName, $columns, $orderBy='')
+    {
+        return $this->selectMultipleRows($tableName, $columns, [1 => 1], $orderBy);
     }
     
     /**
@@ -251,20 +303,7 @@ class Database
 
         $queryString = 'INSERT INTO ' . $tableName . ' (' . $columnNames . ') VALUES (' . $valuesString . ')';
         
-        try {
-            $statement = $this->db_connection->prepare($queryString);
-            
-            $j = 1;
-            foreach($values as $value) {
-                $statement->bindValue($j, $value);
-                $j++;
-            }
-            
-            return $statement->execute();
-        }
-        catch(\PDOException $e) {
-            die($this->showSQLError($e, $queryString));
-        }
+        return $this->runPreparedStatement($queryString, $values);
     }
     
     /**
@@ -276,13 +315,15 @@ class Database
         $columnNames = $whereString = '';
 
         foreach($values as $key => $value) {
-            $comma = ($i == 0) ? '': ',';
-            $columnNames.= $comma.' `'.$key.'`="'.$value.'"';
+            $comma = ($i == 0) ? '': ', ';
+            $columnNames.= $comma . ' `' . $key . '`= ?';
 			$i++;
         }
 
-		$whereString = $this->createWhereStatement($where);
-        return $this->query('UPDATE '.$tableName.' SET '.$columnNames.' WHERE '.$whereString);
+        $whereString = $this->createWhereStatement($where);
+        $queryString = 'UPDATE '.$tableName.' SET '.$columnNames.' WHERE '.$whereString;
+
+        return $this->runPreparedStatement($queryString, $values);
     }
     
     /**
