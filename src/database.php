@@ -29,8 +29,8 @@ namespace rbwebdesigns\core;
  *  Select multiple rows from database
  * @method array selectAllRows(string $tableName, array/string $columnsToSelect, string $strOrderBy='')
  * @method int countRows(string $tableName, array $where='') Get a row count for conditions
- * @method PDOStatement insertRow($tableName, $values)
- * @method PDOStatement updateRow($tableName, $where, $values)
+ * @method bool insertRow($tableName, $values)
+ * @method bool updateRow($tableName, $where, $values)
  * @method PDOStatement deleteRow($tableName, $where)
  * 
  * Documentation:
@@ -51,6 +51,11 @@ class Database
         
     }
     
+    /**
+     * Establish the connection to the database
+     * 
+     * @return PDO
+     */
     public function connect($server, $name, $user, $pass)
     {
         $this->db_name = $name;
@@ -62,7 +67,9 @@ class Database
     }
     
     /**
-     *   Connect to database using PDO
+     * Connect to database using PDO
+     * 
+     * @return PDO
      */
     public function getConnection()
     {
@@ -86,6 +93,8 @@ class Database
 
     /**
      * Get the ID number of the last inserted row using PDO standard methods
+     * 
+     * @return int
      */
     public function getLastInsertID()
     {
@@ -124,6 +133,8 @@ class Database
      * @param array $values
      *   if the keys of the array are named then these will be used as
      *   placeholder names.
+     * 
+     * @return bool
      */
     public function runPreparedStatement($queryString, $values)
     {
@@ -174,6 +185,8 @@ class Database
         
     /**
      * Does the grunt work for select
+     * 
+     * @return string
      */
     private function prepareSimpleSelect($tableName, $columnsToSelect, $where, $orderBy, $limit)
     {
@@ -195,6 +208,8 @@ class Database
     
     /**
      * Select a single row from database
+     * 
+     * @return array
      */
     public function selectSingleRow($tableName, $columns, $where, $orderBy='', $limit='')
     {
@@ -205,6 +220,8 @@ class Database
 
     /**
      * Select a multiple rows from database
+     * 
+     * @return array
      */
     public function selectMultipleRows($tableName, $columns, $where, $orderBy='', $limit='')
     {
@@ -227,6 +244,8 @@ class Database
     
     /**
      * Get a count of rows
+     * 
+     * @return int
      */
     public function countRows($tableName, $where='')
     {
@@ -286,6 +305,8 @@ class Database
     
     /**
      * Insert a new row into the database
+     * 
+     * @return bool
      */
     public function insertRow($tableName, $values)
     {
@@ -308,6 +329,8 @@ class Database
     
     /**
      * Update a (single) row into the database
+     * 
+     * @return bool
      */
     public function updateRow($tableName, $where, $values)
     {
@@ -328,6 +351,8 @@ class Database
     
     /**
      * Delete a row into the database
+     * 
+     * @return PDOStatement
      */
     public function deleteRow($tableName, $where)
     {
