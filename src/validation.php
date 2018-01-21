@@ -1,27 +1,68 @@
 <?php
 namespace rbwebdesigns\core;
 
-class validate {
-
-	public function __construct() {
+/**
+ * src/validation.php
+ * static functions to validate input
+ * 
+ * @author R Bertram <ricky@rbwebdesigns.co.uk>
+ */
+class Validate
+{
+	/**
+	 * Determine if a string is a valid email address
+	 * 
+	 * @param string $email
+	 * @return bool
+	 */
+	public static function email($email)
+	{
+		if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			return true;
+		}
+		return false;
+	}
 	
+	/**
+	 * Determine if a string is a valid integer
+	 * 
+	 * @param mixed $int
+	 * @return bool
+	 */
+	public static function int($int)
+	{
+		if(filter_var($int, FILTER_VALIDATE_INT)) {
+			return true;
+		}
+		return false;
 	}
 
-	// what do we need from a validation class
-	public function validateEmail($email) {
-		if(isEmail($email)) return true;
+	/**
+	 * Determine if a string is a valid date & time (format = Y-m-d H:i:s)
+	 * @todo doesn't actually check the date is a valid in the gregorian calendar
+	 * 
+	 * @param string $timestamp
+	 * @return bool
+	 */
+	public static function dateTime($timestamp)
+	{
+		if(preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/', $timestamp)) {
+			return true;
+		}
+		return false;
 	}
 	
-	public function validateInterger($num) {
-		if(is_numeric($num)) return true;
+	/**
+	 * @todo Implement!
+	 */
+	public static function postcode($postcode) {
+		
 	}
-	
-	public function validatePostcode($postcode) {
-		if(is_valid_uk_postcode($postcode)) return true;
-	}
-	
-	public function validatePhoneNumber($phoneNumber) {
+
+	/**
+	 * @todo Implement!
+	 */
+	public static function phoneNumber($phoneNumber) {
 	
 	}
 }
-?>

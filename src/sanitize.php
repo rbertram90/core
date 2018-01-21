@@ -1,47 +1,30 @@
 <?php
 namespace rbwebdesigns\core;
 
-/**************************************************************************
-	 sanitize.php
-     @description static functions to sanitize input for database storage
-     @author R.Bertram
-     @date 2017
-***************************************************************************/
-
+/**
+ * sanitize.php
+ * static functions to sanitize input for database storage
+ * 
+ * @author R Bertram <ricky@rbwebdesigns.co.uk>
+ */
 class Sanitize
 {
-	// Sanitize a string
-	public static function string($str)
+	/**
+	 * Sanitize funny characters in a string
+	 * @param string $string
+	 * @return string
+	 */
+	public static function string($string)
 	{
-		return filter_var($str, FILTER_SANITIZE_STRING);
-	}
-
-	// Check if a variable is a boolean - be harsh and raise an error if it isn't!
-	public static function boolean($bool)
-	{
-		// note - this is more validation than sanitization!
-		if($bool !== true && $bool !== false && $bool !== 0 && $bool !== 1 && $bool !== "1" && $bool !== "0") {
-			die("Input Type Error - Expected Boolean Found ".$bool." (".getType($bool).")");
-		} else {
-			return $bool;
-		}
+		return filter_var($string, FILTER_SANITIZE_STRING);
 	}
 	
-	// Sanitize a blob upload
-	public static function blob($str)
+	/**
+	 * Sanitize a blob upload
+	 */
+	public static function blob($blob)
 	{
-		// Filter will not work here!
-		return addslashes($str);
-	}
-
-	public static function timestamp($ts)
-	{
-		// note - this is more validation than sanitization!
-		if(!preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/', $ts)) {
-			die("Unable to match timestamp - expected 'YYYY-MM-DD HH:mm:SS' found ".$ts);
-		} else {
-			return $ts;
-		}
+		return addslashes($blob);
 	}
 
 	// Sanitize an integer
