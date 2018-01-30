@@ -46,39 +46,51 @@ class RBFactory
     public function getCount($arrayWhere)
     {
         if(getType($arrayWhere) == 'array') {
-            $this->sanitizeFields($arrayWhere);
-            return $this->db->countRows($this->tblname, $arrayWhere);
+            return $this->db->countRows($this->tableName, $arrayWhere);
         } else {
-            return $this->db->countRows($this->tblname);
+            return $this->db->countRows($this->tableName);
         }
     }
     
+    /**
+     * Select from database
+     * 
+     * @param mixed $arrayWhat
+     *   Columns to fetch from db, pass as either string ('*') or array
+     * @param array $arrayWhere
+     *   Rows to fetch
+     * @param string $orderBy
+     *   Ordering - Standard SQL format
+     * @param string $limit
+     *   Limit rows - matches standard SQL format
+     * @param bool $multi
+     *   Is the expected output a single row (false) or multiple (true)?
+     */
     public function get($arrayWhat, $arrayWhere, $order='', $limit='', $multi=true)
     {
-        $this->sanitizeFields($arrayWhere);
+        // $this->sanitizeFields($arrayWhere);
         if($multi) {
-            return $this->db->selectMultipleRows($this->tblname, $arrayWhat, $arrayWhere, $order, $limit);
+            return $this->db->selectMultipleRows($this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
         } else {
-            return $this->db->selectSingleRow($this->tblname, $arrayWhat, $arrayWhere, $order, $limit);
+            return $this->db->selectSingleRow($this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
         }
     }
     
     public function insert($arrayWhat)
     {
-        $this->sanitizeFields($arrayWhat);
-        return $this->db->insertRow($this->tblname, $arrayWhat);
+        return $this->db->insertRow($this->tableName, $arrayWhat);
     }
     
     public function update($arrayWhere, $arrayWhat)
     {
-        $this->sanitizeFields($arrayWhat);
-        $this->sanitizeFields($arrayWhere);
-        return $this->db->updateRow($this->tblname, $arrayWhere, $arrayWhat);
+        // $this->sanitizeFields($arrayWhat);
+        // $this->sanitizeFields($arrayWhere);
+        return $this->db->updateRow($this->tableName, $arrayWhere, $arrayWhat);
     }
     
     public function delete($arrayWhere)
     {
-        return $this->db->deleteRow($this->tblname, $arrayWhere);
+        return $this->db->deleteRow($this->tableName, $arrayWhere);
     }
     
     public function sanitizeFields(&$values)

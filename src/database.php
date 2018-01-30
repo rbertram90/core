@@ -142,13 +142,14 @@ class Database
 
         try {
             $statement = $this->db_connection->prepare($queryString);
-            
             $j = 1;
             foreach($values as $key => $value) {
-                if($key == $j-1) {
+                if($key === $j-1) {
+                    // print "binding value $j";
                     $statement->bindValue($j, $value);
                 }
                 else {
+                    // print "binding value $key";
                     $statement->bindValue(':' . $key, $value);
                 }
                 $j++;
@@ -168,7 +169,7 @@ class Database
      */
     private function showSQLError($err, $queryString="")
     {
-		if(is_defined(IS_DEVELOPMENT) && IS_DEVELOPMENT) {
+		if(true || defined('IS_DEVELOPMENT') && IS_DEVELOPMENT) {
 			$errMessage = '<p class="error">';
 			$errMessage.= '  <strong>Database Error!</strong><br>';
 			$errMessage.= '  Details: ' . $err->getMessage() . '<br>';
@@ -281,6 +282,10 @@ class Database
                 $value = ltrim($value, '<');
                 $op = '<';
             }
+            elseif($value[0] == '!') {
+                $value = ltrim($value, '!');
+                $op = '!=';
+            }
             else {
                 $op = '=';
             }
@@ -319,11 +324,16 @@ class Database
             $comma = ($i == 0) ? '': ', ';
             $i++;
             $columnNames.= $comma.'`'.$key.'`';
-            $valuesString.= $comma.'?';
+            if(is_numeric($key)) {
+                $valuesString.= $comma.'?';
+            }
+            else {
+                $valuesString.= $comma . ':' . $key;
+            }
         }
 
         $queryString = 'INSERT INTO ' . $tableName . ' (' . $columnNames . ') VALUES (' . $valuesString . ')';
-        
+
         return $this->runPreparedStatement($queryString, $values);
     }
     
@@ -339,7 +349,7 @@ class Database
 
         foreach($values as $key => $value) {
             $comma = ($i == 0) ? '': ', ';
-            $columnNames.= $comma . ' `' . $key . '`= ?';
+            $columnNames.= $comma . ' `' . $key . '`= :'.$key;
 			$i++;
         }
 

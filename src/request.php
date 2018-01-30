@@ -20,7 +20,7 @@ class Request
      * Requests are routed for pretty urls
      * xyz.com/controller/action/data => xyz.com?p=controller&query=action/data
      */
-    public function __construct($options = [])
+    public function __construct($options = array())
     {
         $controllerKey = 'p';
         if(array_key_exists('controllerKey', $options)) {
@@ -59,6 +59,34 @@ class Request
     public function getInt($key, $default = 0)
     {
         return isset($_REQUEST[$key]) ? Sanitize::int($_REQUEST[$key]) : $default;
+    }
+
+    /**
+     * Get the value of a float request variable
+     * @param string
+     *   request key
+     * @param string
+     *   value to use if key not found (default = 0)
+     * @return float
+     *   default if not found
+     */
+    public function getFloat($key, $default = 0.0)
+    {
+        return isset($_REQUEST[$key]) ? Sanitize::float($_REQUEST[$key]) : $default;
+    }
+
+    /**
+     * Get the value of a request variable (no sanitize)
+     * @param string $key
+     *   request array key
+     * @param string $default
+     *   value to use if key not found (default = 0)
+     * @return int
+     *   return value; $default if not found
+     */
+    public function get($key, $default = null)
+    {
+        return isset($_REQUEST[$key]) ? $_REQUEST[$key] : $default;
     }
 
     /**
