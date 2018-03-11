@@ -67,13 +67,22 @@ class Database
     }
     
     /**
+     * @return bool
+     *   Has the connect method been run?
+     */
+    public function isConnected()
+    {
+        return $this->db_connection != null;
+    }
+
+    /**
      * Connect to database using PDO
      * 
      * @return PDO
      */
     public function getConnection()
     {
-        if($this->db_connection !== null) return $this->db_connection;
+        if($this->isConnected()) return $this->db_connection;
 
         try {
             // Try to connect
