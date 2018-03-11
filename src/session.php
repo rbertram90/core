@@ -33,7 +33,8 @@ class Session
      */
     public function setCurrentUser($user)
     {
-        $this->currentUser = $user;
+        $_SESSION['user'] = $user;
+        $this->currentUser = $_SESSION['user'];
     }
 
     /**
