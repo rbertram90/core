@@ -1,11 +1,12 @@
 <?php
 namespace rbwebdesigns\core;
 
-class Router{
+class Router
+{
     private $routes;
     
-    function __construct($proutes) {
-		$this->routes = $proutes;
+    function __construct($routes) {
+		$this->routes = $routes;
     }
     
     public function lookup($query) {
@@ -15,4 +16,3 @@ class Router{
         else return false;
     }
 }
-?>

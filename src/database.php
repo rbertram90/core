@@ -176,7 +176,8 @@ class Database
 			$errMessage.= '  File: <strong>' . $err->getFile() . '</strong><br>';
 			$errMessage.= '  Line: <strong>' . $err->getLine() . '</strong><br>';
 			if(strlen($queryString) > 0) $errMessage.= 'SQL: <strong>' . $queryString . '</strong>';
-			$errMessage.= '</p>';
+            $errMessage.= '</p>';
+            $errMessage.= '<textarea>' . print_r(debug_backtrace(), true) .'</textarea>';
         }
         else {
 			$errMessage = '<p>Oh No! Something has gone wrong, please contact support regarding a database error!</p>';

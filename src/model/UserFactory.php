@@ -23,7 +23,7 @@ class UserFactory extends RBFactory
      */
 	public function __construct($model)
     {
-		$this->db = $model->getDatabaseConnection();
+		$this->db = $model;
         $this->tblname = 'rbwebdesigns.users';
         $this->fields = array(
             'id' => 'number',

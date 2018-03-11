@@ -1,22 +1,23 @@
 <?php
 namespace rbwebdesigns\core;
 
-/******************************************************************
-    Class DateFormatter
-    - Date Formatting
-******************************************************************/
+/**
+ * Class DateFormatter
+ */
 
-class DateFormatter {
-    
-    public function __construct() {
+class DateFormatter
+{
+    public function __construct()
+    {
     }
     
     /**
-        function getAgeInYears
-        @param date <string> DD-MM-YYYY
-        @return <integer> Difference in years from now
-    **/
-    public function getAgeInYears($date) {
+     * function getAgeInYears
+     * @param date <string> DD-MM-YYYY
+     * @return <integer> Difference in years from now
+     */
+    public function getAgeInYears($date)
+    {
         $targetYear = date("Y", strtotime($date));
         $targetMonthDay = 0 + date("nd", strtotime($date));
         $currentMonthDay = 0 + date("nd");
@@ -32,10 +33,18 @@ class DateFormatter {
         return $targetDate;
     }
     
-    public static function formatFriendlyTime($pdTimestamp) {
+    /**
+     * Get a friend time since / remaining string
+     * e.g. "2 days ago", "In 6 hours from now"
+     * 
+     * @param string $timestamp
+     *   Date string to compare to current time
+     * @return string
+     */
+    public static function formatFriendlyTime($timestamp) {
         
         $now = new \DateTime('now');
-        $target = new \DateTime($pdTimestamp);
+        $target = new \DateTime($timestamp);
         
         // Find Differences
         $difference = $target->diff($now);

@@ -11,14 +11,15 @@ namespace rbwebdesigns\core;
  */
 class Session
 {
-
     public $currentUser = null;
 
     /**
      * Start the session
      */
-    public function __construct() {
-        session_start();
+    public function __construct()
+    {
+        if(!isset($_SESSION)) session_start();
+
         if(array_key_exists('user', $_SESSION)) {
             $this->currentUser = $_SESSION['user'];
         }
@@ -48,7 +49,7 @@ class Session
     /**
      * Unset a session variable
      */
-    public function unset($name)
+    public function delete($name)
     {
         unset($_SESSION[$name]);
     }
