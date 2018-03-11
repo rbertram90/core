@@ -26,6 +26,17 @@ class Session
     }
 
     /**
+     * Manually set the current user object
+     * 
+     * @param mixed $user
+     *   Data to store in the current user object
+     */
+    public function setCurrentUser($user)
+    {
+        $this->currentUser = $user;
+    }
+
+    /**
      * Get a session variable
      * @param string $name
      * @param mixed $default
