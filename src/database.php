@@ -121,7 +121,7 @@ class Database
      */
     public function query($queryString)
     {
-        if(!$this->db_connection) return false;
+        if(!$this->db_connection) throw new \Exception('Database not connected');
 
         try {
             $query = $this->db_connection->query($queryString);
@@ -147,7 +147,7 @@ class Database
      */
     public function runPreparedStatement($queryString, $values)
     {
-        if(!$this->db_connection) return false;
+        if(!$this->db_connection) throw new \Exception('Database not connected');
 
         try {
             $statement = $this->db_connection->prepare($queryString);
@@ -325,8 +325,6 @@ class Database
      */
     public function insertRow($tableName, $values)
     {
-        if(!$this->db_connection) return false;
-        
         $i = 0;
         $columnNames = $valuesString = '';
 
