@@ -26,8 +26,13 @@ class Request
         if(array_key_exists('controllerKey', $options)) {
             $controllerKey = $options['controllerKey'];
         }
+
+        $defaultControllerName = 'default';
+        if(array_key_exists('defaultControllerName', $options)) {
+            $defaultControllerName = $options['defaultControllerName'];
+        }
         
-        $this->controller = $this->getString($controllerKey, 0);
+        $this->controller = $this->getString($controllerKey, $defaultControllerName);
         $this->urlParameters = explode('/', $this->getString('query'));
     }
 

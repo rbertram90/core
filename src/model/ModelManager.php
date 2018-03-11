@@ -5,10 +5,9 @@ use rbwebdesigns\core\Database;
 
 class ModelManager
 {
+    protected $name;
     protected $models;
     protected static $instances = [];
-
-    protected $name;
 
     private function __construct()
     {
