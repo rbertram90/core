@@ -108,7 +108,7 @@ class Request
      */
     public function getUrlParameter($index, $default = false)
     {
-        if(array_key_exists($index, $this->urlParameters)) {
+        if(array_key_exists($index, $this->urlParameters) && strlen($this->urlParameters[$index]) > 0) {
             return $this->urlParameters[$index];
         }
         else {

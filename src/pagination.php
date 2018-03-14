@@ -22,7 +22,7 @@ class pagination {
 			// don't copy current page
 		 } else {
 			$url .= $x ? "&" : "";
-			$url .= safeString($key)."=".safeString($value);
+			$url .= Sanitize::string($key)."=".Sanitize::string($value);
 			$x = true;
 		  }
 		}
@@ -32,7 +32,7 @@ class pagination {
 	public function showPagination($pages,$pagenum) {
 		$res = '<div class="pagination">';
 		
-		$url = getCurrentFullURL();
+		$url = $this->getCurrentFullURL();
 		
 		// Don't show back link if current page is first page.
 		if ($pagenum != 1) {
