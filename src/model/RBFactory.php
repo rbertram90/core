@@ -43,6 +43,21 @@ class RBFactory
         return $this->fields;
     }
     
+    /**
+     * Alias of getCount()
+     */
+    public function count($arrayWhere)
+    {
+        return $this->getCount($arrayWhere);
+    }
+
+    /**
+     * Count the number of rows in the database matching criteria
+     * 
+     * @param array $arrayWhere
+     * 
+     * @return int Row count
+     */
     public function getCount($arrayWhere)
     {
         if(getType($arrayWhere) == 'array') {
