@@ -12,7 +12,6 @@ use rbwebdesigns\core\Session;
  */
 class Response
 {
-
     protected $scripts = [];
     protected $stylesheets = [];
     protected $variables = [];
@@ -55,7 +54,8 @@ class Response
     /**
      * Output content template
      */
-    public function write($templatePath) {
+    public function write($templatePath)
+    {
         global $session;
 
         $currentUser = $session->currentUser;
@@ -92,14 +92,16 @@ class Response
     /**
      * Set the main body content
      */
-    public function setBody($output) {
+    public function setBody($output)
+    {
         $this->body = $output;
     }
 
     /**
      * Quick get out of jail free card where page template is not used
      */
-    public function writeBody() {
+    public function writeBody()
+    {
         print $this->body;
     }
 
@@ -155,7 +157,8 @@ class Response
      * @param string $message
      * @param string $messageType
      */
-    public function redirect($location, $message = '', $messageType = 'info') {
+    public function redirect($location, $message = '', $messageType = 'info')
+    {
         if(strlen($message) > 0) {
             Session::addMessage($message, $messageType);
         }
@@ -167,7 +170,8 @@ class Response
     /**
      * Set a response header
      */
-    public function addHeader($name, $value) {
+    public function addHeader($name, $value)
+    {
         header("{$name}: {$value}");
     }
 }
