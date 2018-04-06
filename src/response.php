@@ -168,6 +168,16 @@ class Response
     }
 
     /**
+     * Get or set the response code
+     */
+    public function code($code = -1)
+    {
+        if (is_numeric($code) && $code > -1) http_response_code($code);
+
+        return http_response_code();
+    }
+
+    /**
      * Set a response header
      */
     public function addHeader($name, $value)
