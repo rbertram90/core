@@ -29,23 +29,23 @@ class pagination {
 		return $url;
 	}
 
-	public function showPagination($pages,$pagenum) {
-		$res = '<div class="pagination">';
+	public function showPagination($pages, $pagenum) {
+		$res = '<div class="ui pagination menu">';
 		
 		$url = $this->getCurrentFullURL();
 		
 		// Don't show back link if current page is first page.
 		if ($pagenum != 1) {
-			$res .= '<a href="'.$url.'&s='.($pagenum-1).'">&lt;</a>';
+			$res .= '<a href="'.$url.'&s='.($pagenum-1).'" class="item">&lt;</a>';
 		}
 		// loop through each page and give link to it.
 		for ($i = 1; $i <= $pages; $i++) {
-			if ($pagenum == $i) $res .= '<a><b>'.$i.'</b></a>';
-			else $res .= '<a href="'.$url.'&s='.$i.'">'.$i.'</a>';
+			if ($pagenum == $i) $res .= '<a class="active item"><b>'.$i.'</b></a>';
+			else $res .= '<a href="'.$url.'&s='.$i.'" class="item">'.$i.'</a>';
 		}
 		// If last page don't give next link.
 		if ( $pagenum < $pages ) {
-			$res .= '<a href="'.$url.'&s='.($pagenum+1).'">&gt;</a>';
+			$res .= '<a href="'.$url.'&s='.($pagenum+1).'" class="item">&gt;</a>';
 		}
 		$res .= '</div>';
 		
