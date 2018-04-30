@@ -9,6 +9,7 @@
 			"type": "text",
 			"name": "fld_blogname",
 			"label": "Blog Name",
+			"current": "[!data.name]",
 			"options":
 			{
 				"validation":
@@ -21,7 +22,8 @@
 		{
 			"type": "memo",
 			"name": "fld_blogdesc",
-			"label": "Description"
+			"label": "Description",
+			"current": "[!data.description]"
 		}
 	]
 }
