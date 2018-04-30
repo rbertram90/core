@@ -256,15 +256,19 @@ class Database
     /**
      * Get a count of rows
      * 
+     * @param string $tableName
+     * @param array|string $where
+     *   Conditions to perform count against, can be SQL string or array keyed by columns
+     * 
      * @return int
      */
     public function countRows($tableName, $where='')
     {
-        if(getType($where) == 'array') {
+        if (getType($where) == 'array') {
             $querystring = $this->prepareSimpleSelect($tableName, 'count(*) as rowcount', $where, '', '');
         }
         else {
-            $querystring = 'SELECT count(*) as rowcount from '.$tableName;
+            $querystring = 'SELECT count(*) as rowcount from ' . $tableName;
         }
 
 		$query = $this->query($querystring);
@@ -272,27 +276,31 @@ class Database
 		return $result['rowcount'];
 	}
 	
-    /*
-        ISSUE! Cannot have multiple limitations on the same field as array(
-            'timestamp' => '>now'
-            'timestamp' => '<later'
-        ) will only keep the second rule!
+    /**
+     *  @todo Cannot have multiple limitations on the same field as array(
+     *      'timestamp' => '>now'
+     *      'timestamp' => '<later'
+     *  ) will only keep the second rule!
     */
-    private function createWhereStatement($where)
+    protected function createWhereStatement($where)
     {
         $i = 0;
         $whereString = '';
 
         foreach($where as $key => $value) {
-            if($value[0] == '>') {
+
+            if (strlen($value) == 0) {
+                continue;
+            }
+            elseif ($value[0] == '>') {
                 $value = ltrim($value, '>');
                 $op = '>';
             }
-            elseif($value[0] == '<') {
+            elseif ($value[0] == '<') {
                 $value = ltrim($value, '<');
                 $op = '<';
             }
-            elseif($value[0] == '!') {
+            elseif ($value[0] == '!') {
                 $value = ltrim($value, '!');
                 $op = '!=';
             }
@@ -328,7 +336,7 @@ class Database
         $i = 0;
         $columnNames = $valuesString = '';
 
-        foreach($values as $key => $value) {
+        foreach ($values as $key => $value) {
             $comma = ($i == 0) ? '': ', ';
             $i++;
             $columnNames.= $comma.'`'.$key.'`';
@@ -355,7 +363,7 @@ class Database
         $i = 0;
         $columnNames = $whereString = '';
 
-        foreach($values as $key => $value) {
+        foreach ($values as $key => $value) {
             $comma = ($i == 0) ? '': ', ';
             $columnNames.= $comma . ' `' . $key . '`= :'.$key;
 			$i++;
@@ -369,6 +377,9 @@ class Database
     
     /**
      * Delete a row into the database
+     * 
+     * @param string $tableName
+     * @param array|string $where
      * 
      * @return PDOStatement
      */
