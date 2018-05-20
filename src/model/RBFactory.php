@@ -46,7 +46,7 @@ class RBFactory
     /**
      * Alias of getCount()
      */
-    public function count($arrayWhere)
+    public function count($arrayWhere = '')
     {
         return $this->getCount($arrayWhere);
     }
@@ -58,7 +58,7 @@ class RBFactory
      * 
      * @return int Row count
      */
-    public function getCount($arrayWhere)
+    public function getCount($arrayWhere = '')
     {
         if(getType($arrayWhere) == 'array') {
             return $this->db->countRows($this->tableName, $arrayWhere);
