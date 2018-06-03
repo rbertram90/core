@@ -27,13 +27,18 @@ class Request
             $controllerKey = $options['controllerKey'];
         }
 
+        $paramsKey = 'query';
+        if(array_key_exists('paramsKey', $options)) {
+            $paramsKey = $options['paramsKey'];
+        }
+
         $defaultControllerName = 'default';
         if(array_key_exists('defaultControllerName', $options)) {
             $defaultControllerName = $options['defaultControllerName'];
         }
         
         $this->controller = $this->getString($controllerKey, $defaultControllerName);
-        $this->urlParameters = explode('/', $this->getString('query'));
+        $this->urlParameters = explode('/', $this->getString($paramsKey));
     }
 
     /**
