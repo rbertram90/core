@@ -3,6 +3,10 @@ namespace rbwebdesigns\core\model;
 
 /**
  * core/model/User.php
+ * 
+ * Starter class for a user model, contains only
+ * the really basic fields and functions
+ * 
  * @author R Bertram <ricky@rbwebdesigns.co.uk>
  * 
  * @method boolean updateDetails(array $fields)
@@ -17,115 +21,39 @@ class User extends RBModel
     
     public $id;
 
-	/**
-	 * @param rbwebdesigns\core\Database $databaseConnection
-	 * @param string $tableName
-	 */
-	public function __construct($databaseConnection, $tableName)
+	public function __construct()
     {
         $this->tblname = $tableName;
         $this->fields = array(
             'id' => 'number',
-            'name' => 'string',
-            'surname' => 'string',
             'username' => 'string',
             'password' => 'string',
-            'email' => 'string',
-            'dob' => 'datetime',
-            'gender' => 'string',
-            'location' => 'string',
-            'profile_picture' => 'string',
-            'description' => 'memo',
-            'admin' => 'boolean',
-            'signup_date' => 'datetime',
-            'flickrid' => 'string',
-            'security_q' => 'string',
-            'security_a' => 'string'
         );
     }
 
-	// Update the details of an account
-	public function updateDetails($fields)
+	/**
+	 * Update the details of an account
+	 * 
+	 * @param \rbwebdesigns\core\Request $request
+	 *   Request with POST variables for:
+	 *    * password
+	 *    * password_confirm
+	 */
+	public function updateDetails($request)
     {
-		// Loop through all values in the array fields adding them to the SQL WHERE string
-		$sql_set_clause = "";
-		foreach($fields as $key=> $value)
-        {
-			$sql_set_clause .= " $key='$value',";
-		}
-		
-		// Remove the final unwanted comma
-		$sql_set_clause = substr($sql_set_clause,0,-1);
-		
-		try {
-			$this->db->runQuery("UPDATE ".TBL_USERS." SET $sql_set_clause WHERE id='".$_SESSION['userid']."'");
-			
-		} catch(PDOException $e) { die(showQueryError($e)); }
-		        
-		return true;
-	}
+		if ($request->method() != 'POST') return false;
 
-	// Stage 1 for password update
-	public function updatePassword($details)
-    {
-		// Check the repeated passwords match
-		if($details['new_password'] != $details['new_password_rpt'])
-        {
-			echo showError("Password do not match!");
-			return;
-		}
+		$password = $request->get('password');
+		$passwordConfirm = $request->get('password_confirm');
+
+		if ($password !== $passwordConfirm) return false;
+
 		
-		$lobjUser = $this->getUserById($this->id);
-		
-		// Check the given password matches the database
-		if(md5($details['current_password']) != $lobjUser['password'])
-        {
-			echo showError("Existing password didn't match!");
-			return;
-		}
-		
-		$md5password = md5($details['new_password']);
-		
-		try
-        {
-			$this->db->query("UPDATE ".TBL_USERS." SET password='$md5password' WHERE id='".$this->id."'");
-			
-		} catch(PDOException $e) { die(showQueryError($e)); }
-		
-		return true;
 	}
-	
-	// Password reset request submitted
-	public function resetPassword()
-    {
-		// Generate a password
-		$newpswd = generateRandomAlphaNumeric(8);
-		$hashpswd = md5($newpswd);
-		
-		// Update database
-		try {
-			 $this->db->query("UPDATE ".TBL_USERS." SET password='$hashpswd' WHERE id='$this->id'");
-			 
-		} catch(PDOException $e) { die(showQueryError($e)); }
-		
-		// Return the new password
-		return $newpswd;
-    }
     
     // Delete a user
-	public function deleteAccount()
+	public function deleteAccount($request)
     {
-		try
-        {
-			// Query Database
-			$this->db->query("DELETE FROM ".TBL_USERS." WHERE id=".$this->id, $this->db);
-			
-		} catch(PDOException $e) { die(showQueryError($e)); }
-        
-		// Logout
-		session_destroy();
 		
-		// Redirect to homepage
-		header("Location: index.php");
 	}
 }

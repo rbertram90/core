@@ -29,15 +29,31 @@ use rbwebdesigns\core\Sanitize;
  */
 class RBFactory
 {
+    /**
+     * @var \rbwebdesigns\core\model\ModelManager
+     */
     protected $db;
+    /**
+     * @var string Name of the table for which this model primarily relates
+     */
     protected $tableName;
+    /**
+     * @var array List of the database fields and their associated datatypes
+     */
     protected $fields;
 
+    /**
+     * @param \rbwebdesigns\core\model\ModelManager $model
+     */
     public function __construct($model)
     {
         $this->db = $model->getDatabaseConnection();
     }
     
+    /**
+     * @return array
+     *   List of fields in the database [name => datatype]
+     */
     public function getFields()
     {
         return $this->fields;
