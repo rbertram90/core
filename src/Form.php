@@ -22,7 +22,11 @@ abstract class Form
     /**
      * @var string  Method attribute of the form (GET, POST)
      */
-    public $method;
+    public $method = 'POST';
+    /**
+     * @var string  Encoding type attribute of the form
+     */
+    public $encodingType = 'application/x-www-form-urlencoded';
     /**
      * @var string  Message from failed validation
      */
@@ -155,40 +159,44 @@ abstract class Form
      */
     public function output($print = false)
     {
-        $attributes = "";
-        if (strlen($this->action)) $attributes.= " action='{$this->action}'";
-        if (strlen($this->method)) $attributes.= " method='{$this->method}'";
-
-        foreach ($this->attributes as $key => $value) {
-            $attributes.= sprintf(" %s='%s'", $key, $value);
-        }
-
-        $output = "<form{$attributes}>" . PHP_EOL;
+        $fields = "";
 
         foreach ($this->fields as $name => $field) {
             switch ($field['type']) {
                 case 'upload':
+                    $fields.= $this->createFileUploadField($name, $field);
                     break;
                 case 'date':
                     break;
                 case 'checkboxes':
                     break;
                 case 'radiobuttons':
-                    $output.= $this->createRadios($name, $field);
+                    $fields.= $this->createRadios($name, $field);
                     break;
                 case 'year':
                     $start = isset($field['start']) ? $field['start'] : 1901;
                     $end = isset($field['end']) ? $field['end'] : date('Y');
                     $field['options'] = range($start, $end);
                 case 'dropdown':
-                    $output.= $this->createSelectField($name, $field);
+                    $fields.= $this->createSelectField($name, $field);
                     break;
                 case 'text':
                 default:
-                    $output.= $this->createTextField($name, $field);
+                    $fields.= $this->createTextField($name, $field);
                     break;
             }
         }
+
+        $attributes = "";
+        if (strlen($this->action)) $attributes.= " action='{$this->action}'";
+        if (strlen($this->method)) $attributes.= " method='{$this->method}'";
+        if (strlen($this->encodingType)) $attributes.= " enctype='{$this->encodingType}'";
+
+        foreach ($this->attributes as $key => $value) {
+            $attributes.= sprintf(" %s='%s'", $key, $value);
+        }
+
+        $output = "<form{$attributes}>" . PHP_EOL . $fields;
 
         $output.= "<button>{$this->submitLabel}</button>";
 
@@ -303,6 +311,33 @@ abstract class Form
         $field = "";
         $field.= $this->createLabel();
         $field.= '<input type="checkbox">';
+        return $field;
+    }
+
+    /**
+     * before
+     * after
+     * placeholder
+     * id
+     * label
+     */
+    protected function createFileUploadField($name, $options)
+    {
+        $field = "";
+        $attributes = "";
+        if (isset($options['placeholder'])) $attributes.= " placeholder='{$options['placeholder']}'";
+        if (isset($options['id'])) $attributes.= " id='{$options['id']}'";
+        if (isset($options['required'])) $attributes.= " required";
+
+        $field.= $this->createLabel($name, $options);
+
+        if (isset($options['before'])) $field.= $options['before'];
+
+        $field.= '<input type="file" name="' . $name . '"' . $attributes . '>';
+
+        if (isset($options['after'])) $field.= $options['after'];
+
+        $this->encodingType = 'multipart/form-data';
         return $field;
     }
 

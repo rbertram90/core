@@ -86,6 +86,14 @@ class Request
     }
 
     /**
+     * Get a file from $_FILES
+     */
+    public function getFile($key)
+    {
+        return isset($_FILES[$key]) ? $_FILES[$key] : false;
+    }
+
+    /**
      * Get the value of a request variable (no sanitize)
      * @param string $key
      *   request array key
