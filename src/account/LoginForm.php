@@ -42,19 +42,4 @@ abstract class LoginForm extends Form
         $this->setAttribute('id', 'form_login');
     }
 
-    /**
-     * Run a generic validation process
-     */
-    public function validate($request)
-    {
-        foreach ($this->fields as $key => $field) {
-            switch ($key) {
-                case 'username':
-                    break;
-                case 'password':
-                    break;
-            }
-        }
-    }
-
 }

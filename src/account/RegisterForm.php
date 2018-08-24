@@ -46,16 +46,21 @@ abstract class RegisterForm extends Form
         $this->setAttribute('id', 'form_login');
     }
 
-    public function validate($request)
+    public function validate()
     {
-        foreach ($this->fields as $key => $field) {
-            switch ($key) {
-                case 'username':
-                    break;
-                case 'password':
-                    break;
-            }
+        $username = $this->fields['username']['value'];
+        $password = $this->fields['password']['value'];
+        $password_confirm = $this->fields['password_confirm']['value'];
+        
+        if (strlen($username) < 3) {
+            return false;
         }
+
+        if ($password !== $password_confirm) {
+            return false;
+        }
+
+        return true;
     }
 
 }

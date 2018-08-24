@@ -65,14 +65,14 @@ abstract class Form
      * method here as we don't know enough information
      * about the data.
      */
-    abstract public function validate($request);
+    abstract public function validate();
 
     /**
      * We cannot provide implementation of the submit
      * method here as we don't know how the data is
      * to be saved.
      */
-    abstract public function submit($request);
+    abstract public function submit();
 
     /**
      * Get an attribute from the form tag.
@@ -147,11 +147,21 @@ abstract class Form
      */
     public function setFieldValues($values)
     {
-        foreach ($this->fields as $key => $definition) {
-            if ($values[$key]) {
-                $this->fields[$key]['value'] = $values[$key];
+        if (gettype($values) == 'array') {
+            foreach ($this->fields as $key => $definition) {
+                if ($values[$key]) {
+                    $this->fields[$key]['value'] = $values[$key];
+                }
             }
         }
+        elseif (is_object($values) && get_class($values) == 'rbwebdesigns\core\Request') {
+            foreach ($this->fields as $key => $definition) {
+                if ($values->get($key, false)) {
+                    $this->fields[$key]['value'] = $values->get($key, false);
+                }
+            }
+        }
+        
         return $this;
     }
 
