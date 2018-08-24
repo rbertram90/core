@@ -32,9 +32,13 @@ abstract class Form
      */
     public $error;
     /**
-     * @var string  Result of running the validation method
+     * @var bool  Result of running the validation method
      */
     public $isValid;
+    /**
+     * @var bool  Flag to show the error message if there is an error
+     */
+    public $showErrors = true;
     /**
      * @var string  Text to show on the form submit button
      */
@@ -53,7 +57,7 @@ abstract class Form
      */
     public function __construct()
     {
-
+        
     }
 
     /**
@@ -124,9 +128,10 @@ abstract class Form
      * 
      * @param array $fields
      * 
-     * @return \rbwebdesigns\core\Form $this
+     * @return \rbwebdesigns\core\Form  this
      */
-    public function addFields($fields) {
+    public function addFields($fields)
+    {
         foreach ($fields as $fieldName => $fieldOptions) {
             $this->addField($fieldName, $fieldOptions);
         }
@@ -134,21 +139,20 @@ abstract class Form
     }
 
     /**
-     * Get an array of submitted values
+     * Copy the field values from the request to the fields array
      * 
-     * @param \rbwebdesigns\core\Request $request
+     * @param \rbwebdesigns\core\Request  $request
      * 
-     * @return array
+     * @return \rbwebdesigns\core\Form  this
      */
-    public function getFieldData($request)
+    public function setFieldValues($values)
     {
-        $return = [];
         foreach ($this->fields as $key => $definition) {
-            if ($request->get($key, false)) {
-                $return[$key] = $request->get($key);
+            if ($values[$key]) {
+                $this->fields[$key]['value'] = $values[$key];
             }
         }
-        return $return;
+        return $this;
     }
 
     /**
@@ -180,6 +184,9 @@ abstract class Form
                 case 'dropdown':
                     $fields.= $this->createSelectField($name, $field);
                     break;
+                case 'long text':
+                    $fields.= $this->createTextarea($name, $field);
+                    break;
                 case 'text':
                 default:
                     $fields.= $this->createTextField($name, $field);
@@ -196,8 +203,13 @@ abstract class Form
             $attributes.= sprintf(" %s='%s'", $key, $value);
         }
 
-        $output = "<form{$attributes}>" . PHP_EOL . $fields;
+        $output = "<form{$attributes}>" . PHP_EOL;
 
+        if ($this->error) {
+            $output.= '<p class="message error">'. $this->error .'</p>';
+        }
+
+        $output.= $fields;
         $output.= "<button>{$this->submitLabel}</button>";
 
         $output.= "</form>";
@@ -209,10 +221,6 @@ abstract class Form
     /**
      * @param string $name
      * @param array  $options
-     * type (required)
-     * placeholder
-     * before
-     * after
      * 
      * @example [
      *  'placeholder' => 'First name',
@@ -228,12 +236,15 @@ abstract class Form
         $attributes = "";
         if (isset($options['placeholder'])) $attributes.= " placeholder='{$options['placeholder']}'";
         if (isset($options['before'])) $field.= $options['before'];
+        if (isset($options['required']) && $options['required']) $attributes.= ' required';
 
         $field.= $this->createLabel($name, $options);
 
+        $value = isset($options['value']) ? $options['value'] : '';
+
         $type = $options['type'] == 'password' ? 'password' : 'text';
 
-        $field.= "<input type='{$type}' name='{$name}'{$attributes}>" . PHP_EOL;
+        $field.= "<input type='{$type}' value='{$value}' name='{$name}'{$attributes}>" . PHP_EOL;
 
         if (isset($options['after'])) $field.= $options['after'];
 
@@ -243,10 +254,37 @@ abstract class Form
     /**
      * @param string $name
      * @param array  $options
-     * type (required)
-     * placeholder
-     * before
-     * after
+     * 
+     * @example [
+     *  'placeholder' => 'First name',
+     *  'before' => '',
+     *  'after' => '',
+     *  'label' => 'First name',
+     *  'type' => 'text',
+     * ]
+     */
+    protected function createTextarea($name, $options)
+    {
+        $field = "";
+        $attributes = "";
+        if (isset($options['placeholder'])) $attributes.= " placeholder='{$options['placeholder']}'";
+        if (isset($options['before'])) $field.= $options['before'];
+        if (isset($options['required']) && $options['required']) $attributes.= ' required';
+
+        $field.= $this->createLabel($name, $options);
+
+        $value = isset($options['value']) ? $options['value'] : '';
+
+        $field.= "<textarea name='{$name}'{$attributes}>{$value}</textarea>" . PHP_EOL;
+
+        if (isset($options['after'])) $field.= $options['after'];
+
+        return $field;
+    }
+
+    /**
+     * @param string $name
+     * @param array  $options
      * 
      * @example [
      *  'placeholder' => 'First name',
@@ -265,6 +303,7 @@ abstract class Form
         $attributes = "";
         if (isset($options['placeholder'])) $attributes.= " placeholder='{$options['placeholder']}'";
         if (isset($options['before'])) $field.= $options['before'];
+        if (isset($options['required']) && $options['required']) $attributes.= ' required';
 
         $field.= $this->createLabel($name, $options);
 
@@ -304,7 +343,7 @@ abstract class Form
     }
 
     /**
-     * 
+     * Generates HTML for a single checkbox
      */
     protected function createCheckbox()
     {
@@ -315,11 +354,11 @@ abstract class Form
     }
 
     /**
-     * before
-     * after
-     * placeholder
-     * id
-     * label
+     * Generates HTML for a file upload field
+     * Valid option keys: before, after, placeholder, id, label
+     * 
+     * @param string $name
+     * @param array  $options
      */
     protected function createFileUploadField($name, $options)
     {
@@ -327,7 +366,7 @@ abstract class Form
         $attributes = "";
         if (isset($options['placeholder'])) $attributes.= " placeholder='{$options['placeholder']}'";
         if (isset($options['id'])) $attributes.= " id='{$options['id']}'";
-        if (isset($options['required'])) $attributes.= " required";
+        if (isset($options['required']) && $options['required']) $attributes.= ' required';
 
         $field.= $this->createLabel($name, $options);
 
@@ -341,6 +380,12 @@ abstract class Form
         return $field;
     }
 
+    /**
+     * Generates HTML for a label
+     * 
+     * @param string $name
+     * @param array  $options
+     */
     protected function createLabel($name, $options)
     {
         if ($options['label']) {
