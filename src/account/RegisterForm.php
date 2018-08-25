@@ -53,10 +53,12 @@ abstract class RegisterForm extends Form
         $password_confirm = $this->fields['password_confirm']['value'];
         
         if (strlen($username) < 3) {
+            $this->error = "Username must be more that 3 characters";
             return false;
         }
 
         if ($password !== $password_confirm) {
+            $this->error = "Password fields do not match";
             return false;
         }
 

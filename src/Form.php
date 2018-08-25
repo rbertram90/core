@@ -215,7 +215,7 @@ abstract class Form
 
         $output = "<form{$attributes}>" . PHP_EOL;
 
-        if ($this->error) {
+        if ($this->showErrors && $this->error) {
             $output.= '<p class="message error">'. $this->error .'</p>';
         }
 
