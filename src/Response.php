@@ -25,6 +25,13 @@ class Response
         $this->variables[$name] = $value;
     }
 
+    public function getVar($name) {
+        if (array_key_exists($name, $this->variables)) {
+            return $this->variables[$name];
+        }
+        return false;
+    }
+
     /**
      * Output page template
      */
