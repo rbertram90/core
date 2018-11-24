@@ -42,6 +42,8 @@ class RBFactory
      */
     protected $fields;
 
+    protected $subClass;
+
     /**
      * @param \rbwebdesigns\core\model\ModelManager $model
      */
@@ -99,10 +101,19 @@ class RBFactory
      */
     public function get($arrayWhat, $arrayWhere, $order='', $limit='', $multi=true)
     {
-        // $this->sanitizeFields($arrayWhere);
-        if($multi) {
+        if ($this->subClass) {
+            if ($multi) {
+                return $this->db->selectMultipleRows($this->subClass, $this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
+            }
+            else {
+                return $this->db->selectSingleRow($this->subClass, $this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
+            }
+        }
+
+        if ($multi) {
             return $this->db->selectMultipleRows($this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
-        } else {
+        }
+        else {
             return $this->db->selectSingleRow($this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
         }
     }

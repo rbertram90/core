@@ -176,7 +176,7 @@ class Database
      * 
      * @todo re-consider IS_DEVELOPMENT flag - ENV variable?
      */
-    private function showSQLError($err, $queryString="")
+    protected function showSQLError($err, $queryString="")
     {
 		if(true || defined('IS_DEVELOPMENT') && IS_DEVELOPMENT) {
 			$errMessage = '<p class="error">';
@@ -199,7 +199,7 @@ class Database
      * 
      * @return string
      */
-    private function prepareSimpleSelect($tableName, $columnsToSelect, $where, $orderBy, $limit)
+    protected function prepareSimpleSelect($tableName, $columnsToSelect, $where, $orderBy, $limit)
     {
 		// Columns to fetch
         if(is_array($columnsToSelect)) $columnsToSelect = implode(',', $columnsToSelect);
