@@ -40,10 +40,6 @@ abstract class Form
      */
     public $showErrors = true;
     /**
-     * @var string  Text to show on the form submit button
-     */
-    public $submitLabel = 'Submit';
-    /**
      * @var array  Other attributes to add to the form tag
      */
     protected $attributes;
@@ -51,6 +47,10 @@ abstract class Form
      * @var array  Form field definition
      */
     protected $fields;
+    /**
+     * @var array  Form submit / reset / cancel buttons
+     */
+    protected $actions;
 
     /**
      * Constructor, currently does nothing!
@@ -194,7 +194,8 @@ abstract class Form
                 case 'dropdown':
                     $fields.= $this->createSelectField($name, $field);
                     break;
-                case 'long text':
+                case 'memo':
+                case 'longtext':
                     $fields.= $this->createTextarea($name, $field);
                     break;
                 case 'text':
@@ -220,12 +221,36 @@ abstract class Form
         }
 
         $output.= $fields;
-        $output.= "<button>{$this->submitLabel}</button>";
+
+        foreach ($this->actions as $action) {
+            $attributes = $this->createAttributes($action);
+            if (array_key_exists('type', $action)) $attributes .= " type='{$action['type']}'";
+            $output.= "<button{$attributes}>{$action['label']}</button>";
+        }
 
         $output.= "</form>";
 
         if ($print) echo $output;
         else return $output;
+    }
+
+    /**
+     * Add a button to actions group
+     * 
+     * [
+     *   'label' => 'Submit form'
+     *   'type' => 'submit',
+     *   'attributes' => [
+     *      'data-foo' => 'bar',
+     *      'class' => ''
+     *   ]
+     * ]
+     * 
+     * @param array $action
+     */
+    public function addAction($action)
+    {
+        $this->actions[] = $action;
     }
 
     /**
@@ -243,21 +268,17 @@ abstract class Form
     protected function createTextField($name, $options)
     {
         $field = "";
-        $attributes = "";
+        $attributes = $this->createAttributes($options);
         if (isset($options['placeholder'])) $attributes.= " placeholder='{$options['placeholder']}'";
-        if (isset($options['before'])) $field.= $options['before'];
         if (isset($options['required']) && $options['required']) $attributes.= ' required';
 
         $field.= $this->createLabel($name, $options);
 
         $value = isset($options['value']) ? $options['value'] : '';
-
         $type = $options['type'] == 'password' ? 'password' : 'text';
-
         $field.= "<input type='{$type}' value='{$value}' name='{$name}'{$attributes}>" . PHP_EOL;
 
-        if (isset($options['after'])) $field.= $options['after'];
-
+        $this->createFieldWrapper($options, $field);
         return $field;
     }
 
@@ -276,18 +297,14 @@ abstract class Form
     protected function createTextarea($name, $options)
     {
         $field = "";
-        $attributes = "";
+        $value = isset($options['value']) ? $options['value'] : '';
+        $attributes = $this->createAttributes($options);
         if (isset($options['placeholder'])) $attributes.= " placeholder='{$options['placeholder']}'";
-        if (isset($options['before'])) $field.= $options['before'];
         if (isset($options['required']) && $options['required']) $attributes.= ' required';
 
         $field.= $this->createLabel($name, $options);
-
-        $value = isset($options['value']) ? $options['value'] : '';
-
         $field.= "<textarea name='{$name}'{$attributes}>{$value}</textarea>" . PHP_EOL;
-
-        if (isset($options['after'])) $field.= $options['after'];
+        $this->createFieldWrapper($options, $field);
 
         return $field;
     }
@@ -310,7 +327,7 @@ abstract class Form
     protected function createSelectField($name, $options)
     {
         $field = "";
-        $attributes = "";
+        $attributes = $this->createAttributes($options);
         if (isset($options['placeholder'])) $attributes.= " placeholder='{$options['placeholder']}'";
         if (isset($options['before'])) $field.= $options['before'];
         if (isset($options['required']) && $options['required']) $attributes.= ' required';
@@ -318,19 +335,18 @@ abstract class Form
         $field.= $this->createLabel($name, $options);
 
         $field.= "<select name='{$name}'{$attributes}>";
-
         foreach ($options['options'] as $value => $text) {
             $field.= "<option value='{$value}'>{$text}</option>" . PHP_EOL;
         }
-
         $field.= "</select>";
 
-        if (isset($options['after'])) $field.= $options['after'];
-
+        $this->createFieldWrapper($options, $field);
         return $field;
     }
 
     /**
+     * Generate HTML for a group of radio buttons
+     * 
      * @param string $name
      * @param array  $options
      * type (required)
@@ -341,6 +357,7 @@ abstract class Form
     protected function createRadios($name, $options)
     {
         $field = "";
+        $attributes = $this->createAttributes($options);
 
         foreach ($options['options'] as $option) {
             $field.= '<input type="radio">';
@@ -348,18 +365,24 @@ abstract class Form
                 'label' => $option
             ]);
         }
+        $this->createFieldWrapper($options, $field);
 
         return $field;
     }
 
     /**
      * Generates HTML for a single checkbox
+     * 
+     * @param string $name
+     * @param array  $options
      */
-    protected function createCheckbox()
+    protected function createCheckbox($name, $options)
     {
         $field = "";
         $field.= $this->createLabel();
-        $field.= '<input type="checkbox">';
+        $attributes = $this->createAttributes($options);
+        $field.= "<input type='checkbox' {$attributes}>";
+        $this->createFieldWrapper($options, $field);
         return $field;
     }
 
@@ -373,18 +396,15 @@ abstract class Form
     protected function createFileUploadField($name, $options)
     {
         $field = "";
-        $attributes = "";
+        $attributes = $this->createAttributes($options);
         if (isset($options['placeholder'])) $attributes.= " placeholder='{$options['placeholder']}'";
         if (isset($options['id'])) $attributes.= " id='{$options['id']}'";
         if (isset($options['required']) && $options['required']) $attributes.= ' required';
 
         $field.= $this->createLabel($name, $options);
-
-        if (isset($options['before'])) $field.= $options['before'];
-
         $field.= '<input type="file" name="' . $name . '"' . $attributes . '>';
 
-        if (isset($options['after'])) $field.= $options['after'];
+        $this->createFieldWrapper($options, $field);
 
         $this->encodingType = 'multipart/form-data';
         return $field;
@@ -402,5 +422,39 @@ abstract class Form
             $for = isset($options['id']) ? $options['id'] : $name;
             return sprintf("<label for='%s'>%s</label>", $for, $options['label']);
         }
+    }
+
+    /**
+     * Create an attribute string from array
+     * 
+     * Turns:
+     * ['attributes' => ['class' => 'something', 'id' => 'something_else']]
+     * Into:
+     *  class="something" id="something_else"
+     * 
+     * @param array $field
+     * @return string
+     */
+    protected function createAttributes($field)
+    {
+        $attributes = "";
+        if (array_key_exists('attributes', $field)) {
+            foreach ($field['attributes'] as $key => $value) {
+                $attributes.= sprintf(" %s='%s'", $key, $value);
+            }
+        }
+        return $attributes;
+    }
+
+    /**
+     * Create the field container
+     * 
+     * @param array $options
+     */
+    protected function createFieldWrapper($options, &$output)
+    {
+        $before = isset($options['before']) ? $options['before'] : '<div class="field">';
+        $after = isset($options['after']) ? $options['after'] : '</div>';
+        $output = $before . $output . $after;
     }
 }
