@@ -186,7 +186,7 @@ class Database
 			$errMessage.= '  Line: <strong>' . $err->getLine() . '</strong><br>';
 			if(strlen($queryString) > 0) $errMessage.= 'SQL: <strong>' . $queryString . '</strong>';
             $errMessage.= '</p>';
-            $errMessage.= '<textarea>' . print_r(debug_backtrace(), true) .'</textarea>';
+            $errMessage.= '<textarea>' . print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5), true) .'</textarea>';
         }
         else {
 			$errMessage = '<p>Oh No! Something has gone wrong, please contact support regarding a database error!</p>';
@@ -202,19 +202,21 @@ class Database
     protected function prepareSimpleSelect($tableName, $columnsToSelect, $where, $orderBy, $limit)
     {
 		// Columns to fetch
-        if(is_array($columnsToSelect)) $columnsToSelect = implode(',', $columnsToSelect);
+        if (is_array($columnsToSelect)) $columnsToSelect = implode(',', $columnsToSelect);
         
         // Conditions
-        if(is_array($where)) $where = $this->createWhereStatement($where);
-        else $where = ' ' . $where;
+        if (is_array($where)) {
+            if (count($where)) $where = ' WHERE '. $this->createWhereStatement($where);
+        }
+        elseif (strlen($where > 0)) $where = ' WHERE ' . $where;
         
 		// Order
-		if(strlen($orderBy) > 0) $orderBy = ' ORDER BY ' . $orderBy;
+		if (strlen($orderBy) > 0) $orderBy = ' ORDER BY ' . $orderBy;
 		
 		// Limit
-		if(strlen($limit) > 0) $limit = ' LIMIT ' . $limit;
+		if (strlen($limit) > 0) $limit = ' LIMIT ' . $limit;
 	
-        return 'SELECT '.$columnsToSelect.' FROM '.$tableName.' WHERE '.$where.$orderBy.$limit;
+        return 'SELECT '.$columnsToSelect.' FROM '.$tableName.$where.$orderBy.$limit;
     }
     
     /**
@@ -267,8 +269,11 @@ class Database
         if (getType($where) == 'array') {
             $querystring = $this->prepareSimpleSelect($tableName, 'count(*) as rowcount', $where, '', '');
         }
+        elseif (strlen($where)) {
+            $querystring = 'SELECT count(*) as rowcount from '. $tableName .' WHERE '. $where;
+        }
         else {
-            $querystring = 'SELECT count(*) as rowcount from ' . $tableName;
+            $querystring = 'SELECT count(*) as rowcount from '. $tableName;
         }
 
 		$query = $this->query($querystring);

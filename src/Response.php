@@ -105,6 +105,14 @@ class Response
     }
 
     /**
+     * Get the main body content
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
      * Quick get out of jail free card where page template is not used
      */
     public function writeBody()
