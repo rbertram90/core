@@ -5,17 +5,31 @@ use rbwebdesigns\core\Database;
 
 class ModelManager
 {
-    protected $name;
     protected $models;
     protected static $instances = [];
 
-    private function __construct()
+    /**
+     * ModelManager constructor.
+     */
+    protected function __construct()
     {
+        // Default database abstraction class to rbwebdesigns\core\Database
+        // though can be overwritten via setDatabaseClass()
         $this->databaseConnection = new Database();
+
+        // Storage for the list of models under this database
         $this->models = [];
     }
 
-    public static function getInstance($databaseName) {
+    /**
+     * Get the ModelManager instance (Multiton pattern) for this database
+     * 
+     * @param string $databaseName
+     * 
+     * @return rbwebdesigns\core\model\ModelManager
+     */
+    public static function getInstance($databaseName)
+    {
         if(array_key_exists($databaseName, self::$instances)) {
             return self::$instances[$databaseName];
         }
@@ -26,7 +40,13 @@ class ModelManager
         }
     }
 
-    public function get($model) {
+    /**
+     * Get the class instance for a model, instantiates if needed
+     * 
+     * @return object
+     */
+    public function get($model)
+    {
         if(!array_key_exists($model, $this->models)) {
 
             if(!class_exists($model)) {
@@ -40,9 +60,21 @@ class ModelManager
     }
 
     /**
-     * @return rbwebdesigns/core/database
+     * Get the database class
+     * 
+     * @return rbwebdesigns\core\Database|object
      */
-    public function getDatabaseConnection() {
+    public function getDatabaseConnection()
+    {
         return $this->databaseConnection;
     }
+
+    /**
+     * Set the database
+     */
+    public function setDatabaseClass($class)
+    {
+        $this->databaseConnection = $class;
+    }
+
 }

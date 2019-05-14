@@ -36,6 +36,6 @@ class JSONhelper
      */
     public static function arrayToJSON($array)
     {
-        return json_encode($array, JSON_PRETTY_PRINT);
+        return json_encode($array, JSON_PRETTY_PRINT | JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
 }

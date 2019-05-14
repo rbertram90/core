@@ -25,6 +25,13 @@ class Response
         $this->variables[$name] = $value;
     }
 
+    public function getVar($name) {
+        if (array_key_exists($name, $this->variables)) {
+            return $this->variables[$name];
+        }
+        return false;
+    }
+
     /**
      * Output page template
      */
@@ -95,6 +102,14 @@ class Response
     public function setBody($output)
     {
         $this->body = $output;
+    }
+
+    /**
+     * Get the main body content
+     */
+    public function getBody()
+    {
+        return $this->body;
     }
 
     /**
