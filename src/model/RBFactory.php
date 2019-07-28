@@ -60,6 +60,13 @@ class RBFactory
     {
         return $this->fields;
     }
+
+    /**
+     * Add a field
+     */
+    public function registerField($name, $type) {
+        $this->fields[$name] = $type;
+    }
     
     /**
      * Alias of getCount()
