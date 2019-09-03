@@ -68,7 +68,7 @@ class Request
      */
     public function getInt($key, $default = 0)
     {
-        return isset($_REQUEST[$key]) ? Sanitize::int($_REQUEST[$key]) : $default;
+        return isset($_REQUEST[$key]) ? intval(Sanitize::int($_REQUEST[$key])) : $default;
     }
 
     /**

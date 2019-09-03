@@ -26,56 +26,74 @@ class ImageUpload
         return strtolower(end(explode('.', $this->data['name'])));
     }
     
-    // Create thumbnail (current image, new image folder)
-    // createThumb($user_image_folder."/".$_FILES["file"]["name"], $user_image_folder."/square/", 300, 300);
-    public function createThumbnail($psImagePath, $psDestinationPath, $piWidth = 300, $piHeight = 300) {
-        
-        // Actual Image Size
-        list($imageHeight, $imageWidth) = getimagesize($psImagePath);
-        
-        // Thumbnail Size
-        list($thumbHeight, $thumbWidth) = array($piHeight, $piWidth);
+    /**
+     * Create a resized image from original upload
+     * 
+     * createThumbnail($user_image_folder."/square/", 300, 300);
+     */
+    public function createThumbnail($destinationPath, $newFilename='', $thumbWidth=300, $thumbHeight=300)
+    {
+        if (!array_key_exists('new_path', $this->data)) {
+            die('Image has not been uploaded yet');
+        }
+
+        $imagePath = $this->data['new_path'];
+
+        list($imageWidth, $imageHeight) = getimagesize($imagePath);
+        $widthRatio = $imageWidth / $thumbWidth;
+        $heightRatio = $imageHeight / $thumbHeight;
         
         // Create full size Image from file path
-        $srcImage = imagecreatefromjpeg($psImagePath);
-        
-        $lsTargetDir = pathinfo($psDestinationPath, PATHINFO_DIRNAME);
-                
-        // Create the directory structure if not already in place
-        if(!is_dir($lsTargetDir) && strlen($lsTargetDir) > 0) mkdir($lsTargetDir);
-        
-        // Find the smallest of the two
-        $min = min(array($imageHeight, $imageWidth));
-        
-        // Calculate how to resize the image to a (smaller?) one
-        if($min == $imageWidth) {
-            $startY = 0;
-            $startX = floor(($imageHeight - $imageWidth) / 2);
+        if ($this->data['type'] == 'image/jpg' || $this->data['type'] == 'image/jpeg') {
+            $srcImage = imagecreatefromjpeg($imagePath);
+        }
+        elseif ($this->data['type'] == 'image/png') {
+            $srcImage = imagecreatefrompng($imagePath);
         }
         else {
+            die('Cannot create thumbnail from image type: '. $this->data['type']);
+        }
+        
+        // Create the directory structure if not already in place
+        if (!is_dir($destinationPath) && strlen($destinationPath) > 0) {
+            mkdir($destinationPath, 0777, true);
+        }
+        if (is_null($newFilename) || strlen($newFilename) == 0) {
+            $newFilename = pathinfo($this->data['new_path'])['basename'];
+        }
+        
+        // Find the smallest of the two
+        $min = min(array($widthRatio, $heightRatio));
+        
+        // Calculate how to resize the image to a (smaller?) one
+        if($min == $widthRatio) {
             $startX = 0;
-            $startY = floor(($imageWidth - $imageHeight) / 2);
+            $startY = floor(($imageHeight - $thumbHeight * $widthRatio) / 2);
+            $sourceWidth = $imageWidth;
+            $sourceHeight = $thumbHeight * $widthRatio;
+        }
+        else {
+            $startY = 0;
+            $startX = floor(($imageWidth - $thumbWidth * $heightRatio) / 2);
+            $sourceWidth = $thumbWidth * $heightRatio;
+            $sourceHeight = $imageHeight;
         }
         
         // Create thumbnail
         $destImage = imagecreatetruecolor($thumbWidth, $thumbHeight);
         
-        //imagecopy($destImage, $srcImage, 0, 0, $startX, $startY, $min, $min);
-        imagecopyresampled($destImage, $srcImage, 0, 0, $startX, $startY, $thumbWidth, $thumbHeight, $min, $min);
+        // imagecopy($destImage, $srcImage, 0, 0, $startX, $startY, $min, $min);
+        imagecopyresampled($destImage, $srcImage, 0, 0, $startX, $startY, $thumbWidth, $thumbHeight, $sourceWidth, $sourceHeight);
         
         // Output to file
-        imagejpeg($destImage, $psDestinationPath);
-        
-        // Create return information
-        $larrUpload = array();
-        $larrUpload['filename'] = $psDestinationPath;
-        $larrUpload['filepath'] = $psDestinationPath;
-        $larrUpload['filesize'] = getimagesize($psDestinationPath);
-        $larrUpload['fileerror'] = '';
-        
-        // Output to screen?
-        // echo "<p><img src='$destLoc' alt='thumbnail' /></p>";
-        return $larrUpload;
+        if ($this->data['type'] == 'image/jpg' || $this->data['type'] == 'image/jpeg') {
+            $image = imagejpeg($destImage, $destinationPath .'/'. $newFilename);
+        }
+        elseif ($this->data['type'] == 'image/png') {
+            $image = imagepng($destImage, $destinationPath .'/'. $newFilename);
+        }
+
+        return $image;
     }
     
 	/*
