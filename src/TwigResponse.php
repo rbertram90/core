@@ -18,7 +18,7 @@ class TwigResponse extends Response
     }
 
     /**
-     * Provide a render function that uses smarty template
+     * Provide a render function that uses Twig template
      */
     public function write($templatePath)
     {
@@ -26,19 +26,42 @@ class TwigResponse extends Response
     }
 
     /**
-     * Output the template SMARTY style
+     * Output the template Twig style
      */
     public function writeTemplate($templatePath)
     {
-        $this->write($templatePath);
+        // $currentUser = $session->currentUser;
+        // $messages = $session->getAllMessages();
+
+        print $this->twig->render($templatePath, array_merge($this->templateVarables, [
+            'scripts' => $this->prepareScripts(),
+            'stylesheets' => $this->prepareStylesheets(),
+            'content' => $this->body
+        ]));
     }
 
     /**
-     * Overwrites default to use smarty templates
+     * Overwrites default to use Twig templates
      */
     public function setVar($name, $value)
     {
         $this->templateVarables[$name] = $value;
     }
+
+    /**
+     * Enable twig debug mode
+     */
+    public function enableDebug() {
+        $this->twig->enableDebug();
+        $this->enableAutoReload();
+    }
+
+    /**
+     * Enables the auto_reload option.
+     */
+    public function enableAutoReload() {
+        $this->twig->enableAutoReload();
+    }
+
 
 }
