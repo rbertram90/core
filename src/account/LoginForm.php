@@ -39,6 +39,12 @@ abstract class LoginForm extends Form
                 'required' => true
             ]
         ];
+        $this->actions = [
+            [
+                'type' => 'submit',
+                'label' => 'Log in',
+            ]
+        ];
         $this->setAttribute('id', 'form_login');
     }
 

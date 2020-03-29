@@ -43,6 +43,12 @@ abstract class RegisterForm extends Form
                 'required' => true
             ]
         ];
+        $this->actions = [
+            [
+                'type' => 'submit',
+                'label' => 'Register',
+            ]
+        ];
         $this->setAttribute('id', 'form_login');
     }
 
