@@ -50,6 +50,14 @@ class Request
     }
 
     /**
+     * @return string request path
+     */
+    public function path()
+    {
+        return $_SERVER['REQUEST_URI'];
+    }
+
+    /**
      * Get the value of a string request variable
      * @param  string  request key
      * @param  string  value to use if key not found (default = '')
