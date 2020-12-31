@@ -4,10 +4,6 @@ namespace rbwebdesigns\core;
 /**
  * core/session.php
  * @author R Bertram <ricky@rbwebdesigns.co.uk>
- *
- * @property rbwebdesigns\core\model\User $currentUser;
- * @method mixed get(string $name, mixed $default)
- * @method void set(string $name, mixed $value)
  */
 class Session
 {
@@ -39,8 +35,11 @@ class Session
 
     /**
      * Get a session variable
+     *
      * @param string $name
      * @param mixed $default
+     *
+     * @return mixed
      */
     public function get($name, $default = '')
     {
@@ -50,6 +49,7 @@ class Session
 
     /**
      * Set a session variable
+     *
      * @param string $name
      * @param mixed $value
      */
@@ -60,6 +60,8 @@ class Session
 
     /**
      * Unset a session variable
+     *
+     * @param string $name
      */
     public function delete($name)
     {

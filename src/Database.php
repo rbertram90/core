@@ -3,36 +3,9 @@ namespace rbwebdesigns\core;
 
 /**
  * Class DB
- *   - All database access using PDO
- *   - All SQL errors caught and handled in consistant way
- *   - Limitations/ future improvements:
- *       - update and delete only handle WHERE val=this
- *       - update, insert and delete will only handle one insert
- *       - data needs to be validated and verified before being
- *         passed here.
- *       - could use prepare statements instead?
- * 
- * @method PDO connect(string $server, string $name, string $user, string $password)
- *  Supply connection information and get database connection object in return
- * @method PDO getConnection()
- *  Get the current database connection object - connect() must have already been called
- * @method int getLastInsertID()
- *  This has limited use as a public method as needs to be called within transaction
- * @method PDOStatement query(string $queryString)
- *  Run raw sql - recommended to use the helper functions for simple queries and this for more complicated ones
- * @method bool runPreparedStatement(string $queryString, array $values)
- *  Run prepared statement SQL (that is already formatted with placeholders) with $values to pass through.
- *  Returns the result of the execution
- * @method array selectSingleRow(string $tableName, array/string $columnsToSelect, array $where, string $strOrderBy='', string $strLimit='')
- *  Select a single row from database
- * @method array selectMultipleRows(string $tableName, array/string $columnsToSelect, array $where, string $strOrderBy='', string $strLimit='')
- *  Select multiple rows from database
- * @method array selectAllRows(string $tableName, array/string $columnsToSelect, string $strOrderBy='')
- * @method int countRows(string $tableName, array $where='') Get a row count for conditions
- * @method bool insertRow($tableName, $values)
- * @method bool updateRow($tableName, $where, $values)
- * @method PDOStatement deleteRow($tableName, $where)
- * 
+ *
+ * Database abstraction layer, creates and runs SQL
+ *
  * Documentation:
  * https://github.com/rbertram90/core/wiki/Database
  * 
@@ -46,15 +19,17 @@ class Database
     protected $db_server = '';
     private $db_connection = null;
 
-    public function __construct()
-    {
-        
-    }
-    
+    public function __construct() {}
+
     /**
      * Establish the connection to the database
-     * 
-     * @return PDO
+     *
+     * @param string $server
+     * @param string $name
+     * @param string $user
+     * @param string $pass
+     *
+     * @return \PDO
      */
     public function connect($server, $name, $user, $pass)
     {
@@ -78,15 +53,18 @@ class Database
     /**
      * Connect to database using PDO
      * 
-     * @return PDO
+     * @return \PDO
      */
     public function getConnection()
     {
-        if($this->isConnected()) return $this->db_connection;
+        if ($this->isConnected()) {
+            return $this->db_connection;
+        }
 
         try {
             // Try to connect
             $db_connect = new \PDO('mysql:host='.$this->db_server.';dbname='.$this->db_name, $this->db_user, $this->db_pass);
+
             // Set exceptions to show
             $db_connect->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
@@ -107,7 +85,9 @@ class Database
      */
     public function getLastInsertID()
     {
-        if(!$this->db_connection) return false;
+        if (!$this->db_connection) {
+            return false;
+        }
 
         return $this->db_connection->lastInsertId();
     }
@@ -116,12 +96,16 @@ class Database
      * Run a standard query straight into the database
      * ideally shouldn't be called from outside this class,
      * but sometimes necessary for complex queries.
-     * 
-     * @return PDOStatement
+     *
+     * @return \PDOStatement
+     * @throws \PDOException|\Exception
+     *
      */
     public function query($queryString)
     {
-        if(!$this->db_connection) throw new \Exception('Database not connected');
+        if(!$this->db_connection) {
+            throw new \Exception('Database not connected');
+        }
 
         try {
             $query = $this->db_connection->query($queryString);
@@ -144,10 +128,13 @@ class Database
      *   placeholder names.
      * 
      * @return bool
+     * @throws \PDOException|\Exception
      */
     public function runPreparedStatement($queryString, $values)
     {
-        if(!$this->db_connection) throw new \Exception('Database not connected');
+        if(!$this->db_connection) {
+            throw new \Exception('Database not connected');
+        }
 
         try {
             $statement = $this->db_connection->prepare($queryString);
@@ -386,7 +373,7 @@ class Database
      * @param string $tableName
      * @param array|string $where
      * 
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function deleteRow($tableName, $where)
     {
