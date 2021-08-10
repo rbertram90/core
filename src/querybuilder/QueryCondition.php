@@ -23,6 +23,9 @@ class QueryCondition {
         elseif ($this->value == 'CURRENT_TIMESTAMP') {
             return $this->name . ' ' . $this->operator . ' ' . $this->value;
         }
+        elseif (is_object($this->value) && $this->value instanceof SelectQuery) {
+            return $this->name . ' ' . $this->operator . ' (' . $this->value->sql() . ')';
+        }
         else {
             return $this->name . ' ' . $this->operator . '"' . $this->value . '"';
         }

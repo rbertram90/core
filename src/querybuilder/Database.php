@@ -12,17 +12,25 @@ class Database {
 
     /**
      * @param string[] $config
+     *  [
+     *    'host' => 'HOST NAME',
+     *    'port' => 'PORT NUMBER',
+     *    'name' => 'DATABASE NAME',
+     *    'user' => 'USERNAME',
+     *    'password' => 'PASSWORD'
+     *  ]
      * 
-     * [
-     *   'host' => 'DATABASE HOST NAME',
-     *   'port' => 'DATABASE PORT NUMBER',
-     *   'name' => 'DATABASE NAME',
-     *   'user' => 'DATABASE USER',
-     *   'password' => 'DATABASE PASSWORD',
-     * ]
+     * @throws PDOException
      */
     public function __construct($config) {
-        $this->config = $config;
+        $this->config = array_merge([
+            'host' => 'localhost',
+            'port' => 3306,
+            'name' => 'hamletcms',
+            'user' => 'root',
+            'password' => '',
+        ], $config);
+
         $this->connect();
     }
 
@@ -32,7 +40,7 @@ class Database {
      * @throws PDOException
      */
     protected function connect() {
-        $this->connection = new \PDO('mysql:host=' . $this->config['host'] . ';port=' . $this->config['port'] . ';dbname=' . $this->config['name'], $this->config['user'], $this->config['password']);
+        $this->connection = new \PDO("mysql:host={$this->config['host']}; port={$this->config['port']}; dbname={$this->config['name']}", $this->config['user'], $this->config['password']);
     }
 
     /**
@@ -40,11 +48,13 @@ class Database {
      * 
      * @param string $table
      *  Database table name
+     * @param string $alias
+     *  Database table alias
      * 
      * @return \rbwebdesigns\core\querybuilder\SelectQuery
      */
-    public function select(string $table) {
-        return new SelectQuery($this, $table);
+    public function select(string $table, string $alias = '') {
+        return new SelectQuery($this, $table, $alias);
     }
 
     /**
