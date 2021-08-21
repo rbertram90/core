@@ -107,7 +107,7 @@ class Request
      *   request array key
      * @param string $default
      *   value to use if key not found (default = 0)
-     * @return int
+     * @return mixed
      *   return value; $default if not found
      */
     public function get($key, $default = null)

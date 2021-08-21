@@ -173,36 +173,47 @@ abstract class Form
      */
     public function output($print = false)
     {
-        $fields = "";
+        $fieldOutput = [];
 
         foreach ($this->fields as $name => $field) {
+            $fieldHTML = "";
             switch ($field['type']) {
                 case 'upload':
-                    $fields.= $this->createFileUploadField($name, $field);
+                    $fieldHTML = $this->createFileUploadField($name, $field);
                     break;
                 case 'date':
+                    break;
+                case 'markup':
+                    $fieldHTML = $this->createMarkup($name, $field);
+                    break;
+                case 'checkbox':
+                    $fieldHTML = $this->createCheckbox($name, $field);
                     break;
                 case 'checkboxes':
                     break;
                 case 'radiobuttons':
-                    $fields.= $this->createRadios($name, $field);
+                    $fieldHTML = $this->createRadios($name, $field);
                     break;
                 case 'year':
                     $start = isset($field['start']) ? $field['start'] : 1901;
                     $end = isset($field['end']) ? $field['end'] : date('Y');
                     $field['options'] = range($start, $end);
                 case 'dropdown':
-                    $fields.= $this->createSelectField($name, $field);
+                    $fieldHTML = $this->createSelectField($name, $field);
                     break;
                 case 'memo':
                 case 'longtext':
-                    $fields.= $this->createTextarea($name, $field);
+                    $fieldHTML = $this->createTextarea($name, $field);
                     break;
                 case 'text':
                 default:
-                    $fields.= $this->createTextField($name, $field);
+                    $fieldHTML = $this->createTextField($name, $field);
                     break;
             }
+            if (isset($field['conditions'])) {
+                $this->addConditionalVisibility($fieldHTML, $field);
+            }
+            $fieldOutput[] = $fieldHTML;
         }
 
         $attributes = "";
@@ -220,7 +231,7 @@ abstract class Form
             $output.= '<p class="message error">'. $this->error .'</p>';
         }
 
-        $output.= $fields;
+        $output.= implode(PHP_EOL, $fieldOutput);
 
         foreach ($this->actions as $action) {
             $attributes = $this->createAttributes($action);
@@ -275,7 +286,8 @@ abstract class Form
         $field.= $this->createLabel($name, $options);
 
         $value = isset($options['value']) ? $options['value'] : '';
-        $type = $options['type'] == 'password' ? 'password' : 'text';
+        $validTypes = ['password', 'text', 'number', 'email', 'tel'];
+        $type = in_array($options['type'], $validTypes) ? $options['type'] : 'text';
         $field.= "<input type='{$type}' value='{$value}' name='{$name}'{$attributes}>" . PHP_EOL;
 
         $this->createFieldWrapper($options, $field);
@@ -307,6 +319,20 @@ abstract class Form
         $this->createFieldWrapper($options, $field);
 
         return $field;
+    }
+
+    /**
+     * @param string $name
+     * @param array  $options
+     * 
+     * @example [
+     *  'markup' => '<p>Hello!</p>',
+     *  'type' => 'markup',
+     * ]
+     */
+    protected function createMarkup($name, $options)
+    {
+        return $options['markup'];
     }
 
     /**
@@ -379,7 +405,7 @@ abstract class Form
     protected function createCheckbox($name, $options)
     {
         $field = "";
-        $field.= $this->createLabel();
+        $field.= $this->createLabel($name, $options);
         $attributes = $this->createAttributes($options);
         $field.= "<input type='checkbox' {$attributes}>";
         $this->createFieldWrapper($options, $field);
@@ -457,4 +483,33 @@ abstract class Form
         $after = isset($options['after']) ? $options['after'] : '</div>';
         $output = $before . $output . $after;
     }
+
+    /**
+     * Create a field wrapper with JS logic to hide and show the field dynamically
+     */
+    protected function addConditionalVisibility(&$fieldHTML, $field) {
+        $script = '';
+        $uniqueFnId = uniqid();
+
+        if (isset($field['conditions']['show'])) {
+            $conditions = [];
+            
+            foreach ($field['conditions']['show'] as $fieldId => $targetValue) {
+                $i = 0;
+                $conditions[] = "document.getElementById('{$fieldId}').value == '{$targetValue}'";
+                $listeners[] = "function showField{$uniqueFnId}_{$i}() {
+                    document.getElementById('cond{$uniqueFnId}').style.display = showField{$uniqueFnId}() ? 'block' : 'none';
+                }
+                document.getElementById('{$fieldId}').addEventListener('change', showField{$uniqueFnId}_{$i});
+                showField{$uniqueFnId}_{$i}();";
+                $i++;
+            }
+            $script .= "function showField{$uniqueFnId}() { return " . implode(' && ', $conditions) . '; }';
+            $script .= implode(PHP_EOL, $listeners);
+        }
+
+        $script = '<script>' . $script . '</script>';
+        $fieldHTML = "<div id='cond{$uniqueFnId}'>{$fieldHTML}</div>{$script}";
+    }
+
 }
