@@ -41,7 +41,9 @@ class RBFactory
      * @var array List of the database fields and their associated datatypes
      */
     protected $fields;
-
+    /**
+     * @var string If set, enables fetching objects automatically, rather than array
+     */
     protected $subClass;
 
     /**

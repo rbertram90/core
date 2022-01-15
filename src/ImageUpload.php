@@ -33,6 +33,10 @@ class ImageUpload
      */
     public function createThumbnail($destinationPath, $newFilename='', $thumbWidth=300, $thumbHeight=300)
     {
+        if (!function_exists('imagecreatefromjpeg')) {
+            trigger_error('Unable to create thumbnail, is the GD image library enabled in PHP config?', E_USER_ERROR);
+        }
+
         if (!array_key_exists('new_path', $this->data)) {
             die('Image has not been uploaded yet');
         }
@@ -56,7 +60,9 @@ class ImageUpload
         
         // Create the directory structure if not already in place
         if (!is_dir($destinationPath) && strlen($destinationPath) > 0) {
-            mkdir($destinationPath, 0777, true);
+            if (!mkdir($destinationPath, 0777, true)) {
+                trigger_error('Unable to create folder ' . $destinationPath, E_USER_ERROR);
+            }
         }
         if (is_null($newFilename) || strlen($newFilename) == 0) {
             $newFilename = pathinfo($this->data['new_path'])['basename'];
