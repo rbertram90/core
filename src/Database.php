@@ -196,7 +196,7 @@ class Database
             if (count($where)) $where = ' WHERE '. $this->createWhereStatement($where);
         }
         elseif (strlen($where > 0)) $where = ' WHERE ' . $where;
-        
+
 		// Order
 		if (strlen($orderBy) > 0) $orderBy = ' ORDER BY ' . $orderBy;
 		
@@ -283,6 +283,9 @@ class Database
 
             if (strlen($value) == 0) {
                 continue;
+            }
+            elseif (gettype($value) !== 'string') {
+                $op = '=';
             }
             elseif ($value[0] == '>') {
                 $value = ltrim($value, '>');

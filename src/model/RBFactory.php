@@ -30,7 +30,7 @@ use rbwebdesigns\core\Sanitize;
 class RBFactory
 {
     /**
-     * @var \rbwebdesigns\core\model\ModelManager
+     * @var \rbwebdesigns\core\ObjectDatabase
      */
     protected $db;
     /**
@@ -110,10 +110,10 @@ class RBFactory
     {
         if ($this->subClass) {
             if ($multi) {
-                return $this->db->selectMultipleRows($this->subClass, $this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
+                return $this->db->selectMultipleObjects($this->subClass, $this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
             }
             else {
-                return $this->db->selectSingleRow($this->subClass, $this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
+                return $this->db->selectSingleObject($this->subClass, $this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
             }
         }
 

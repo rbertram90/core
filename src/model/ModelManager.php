@@ -26,7 +26,7 @@ class ModelManager
      * 
      * @param string $databaseName
      * 
-     * @return rbwebdesigns\core\model\ModelManager
+     * @return \rbwebdesigns\core\model\ModelManager
      */
     public static function getInstance($databaseName)
     {

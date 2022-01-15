@@ -22,7 +22,7 @@ class ObjectDatabase extends Database
      * 
      * @return object
      */
-    public function selectSingleRow($className, $tableName, $columns, $where, $orderBy='', $limit='')
+    public function selectSingleObject($className, $tableName, $columns, $where, $orderBy='', $limit='')
     {
         $queryString = $this->prepareSimpleSelect($tableName, $columns, $where, $orderBy, $limit);
         return $this->query($queryString)->fetchObject($className);
@@ -40,7 +40,7 @@ class ObjectDatabase extends Database
      * 
      * @return object[]
      */
-    public function selectMultipleRows($className, $tableName, $columns, $where, $orderBy='', $limit='')
+    public function selectMultipleObjects($className, $tableName, $columns, $where, $orderBy='', $limit='')
     {
         $queryString = $this->prepareSimpleSelect($tableName, $columns, $where, $orderBy, $limit);
 		$query = $this->query($queryString);
@@ -57,8 +57,9 @@ class ObjectDatabase extends Database
      * 
      * @return object[]
      */
-    public function selectAllRows($className, $tableName, $columns, $orderBy='')
+    public function selectAllObjects($className, $tableName, $columns, $orderBy='')
     {
-        return $this->selectMultipleRows($className, $tableName, $columns, [1 => 1], $orderBy);
+        return $this->selectMultipleObjects($className, $tableName, $columns, [1 => 1], $orderBy);
     }
+
 }

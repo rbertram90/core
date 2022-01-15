@@ -232,7 +232,7 @@ class SelectQuery {
         }
 
         if (count($this->conditions) > 0) {
-            array_walk($this->conditions, 'strval');
+            $this->conditions = array_map('strval', $this->conditions);
             $sql .= ' WHERE ' . implode(' AND ', $this->conditions);
         }
 
