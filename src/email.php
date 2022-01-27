@@ -1,35 +1,61 @@
 <?php
+
 namespace rbwebdesigns\core;
 
-class EmailHelper {
+/**
+ * Simple wrapper class around php mail() function.
+ */
+class Email {
 
-	public function __construct() {
-		
-	}
+	/** @var bool Does the email contain HTML formatting? */
+	public $html = true;
+
+	/** @var string Recipient email address */
+	public $recipient;
+
+	/** @var string 'From' email address */
+	public $sender;
+
+	/** @var string Email subject line */
+	public $subject;
+
+	/** @var string Email body */
+	public $message;
 	
-	public function safeEmail(&$psField) {
-	    filter_var($psField, FILTER_SANITIZE_EMAIL);
-	    if(filter_var($psField, FILTER_VALIDATE_EMAIL)) return true;
-	    else return false;
-	}
-	
-	public function send($psRecipient, $psSender, $psSubject, $psMessage) {
-		
-		// Santize Email Addresses
-		$this->safeEmail($psRecipient);
-		$this->safeEmail($psSender);
-		
-		// Check that both were valid
-		if(!$psRecipient || !$psSender) return 'Unable to send email - Missing email address';
-		
-		// Sanitize the content
-		$psSubject = filter_var($psSubject, FILTER_SANITIZE_STRING);
-		$psMessage = filter_var($psMessage, FILTER_SANITIZE_STRING);
-		
+	/**
+	 * Send the email.
+	 * 
+	 * @return bool Was the email sent correctly?
+	 */
+	public function send() {
+		if (!$this->validate()) {
+			// @todo some sort of logging
+			return false;
+		}
+
+		$headers = 'From: ' . $this->sender . "\r\n";
+		$headers .= "Reply-To: ". $this->sender . "\r\n";
+
+		if ($this->html) {
+			$headers .= 'MIME-Version: 1.0' . "\r\n";
+			$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
+		}
+		else {
+			$headers .= 'Content-type: text/plain; charset=utf-8' . "\r\n";
+		}
+
 		// Send the email
-		mail($psSender, 'Subject: '.$psSubject, $psMessage, 'From: '.$psRecipient);
-		
-		return 'Message sent successfully';
+		return mail($this->recipient, 'Subject: ' . $this->subject, $this->message, $headers);
 	}
+
+	protected function validate() {
+		if (!filter_var($this->sender, FILTER_VALIDATE_EMAIL)) {
+			return false;
+		}
+		if (!filter_var($this->recipient, FILTER_VALIDATE_EMAIL)) {
+			return false;
+		}
+		return true;
+	}
+
 }
-?>
