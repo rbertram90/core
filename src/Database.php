@@ -280,8 +280,10 @@ class Database
         $whereString = '';
 
         foreach($where as $key => $value) {
-
-            if (strlen($value) == 0) {
+            if (is_array($value)) {
+                $op = ' IN ';
+            }
+            elseif (strlen($value) == 0) {
                 continue;
             }
             elseif (gettype($value) !== 'string') {
@@ -303,12 +305,15 @@ class Database
                 $op = '=';
             }
             
-            // Look for dates
-            if(preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}/', $value)) {
+            if (is_array($value)) {
+                $value = '(' . implode(',', $value) . ')';
+            }
+            elseif (preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}/', $value)) {
+                // Look for dates
                 $value = 'TIMESTAMP("'.$value.'")';
             }
-            elseif(trim($value) == 'CURRENT_TIMESTAMP') {
-                 $value = "CURRENT_TIMESTAMP"; // hack around for sql keyword.
+            elseif (trim($value) == 'CURRENT_TIMESTAMP') {
+                $value = "CURRENT_TIMESTAMP"; // hack around for sql keyword.
             }
             else {
                 $value = "'".$value."'";
