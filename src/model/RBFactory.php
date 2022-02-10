@@ -47,10 +47,16 @@ class RBFactory
     protected $subClass;
 
     /**
+     * @var \rbwebdesigns\core\model\ModelManager
+     */
+    protected $modelManager;
+
+    /**
      * @param \rbwebdesigns\core\model\ModelManager $model
      */
     public function __construct($model)
     {
+        $this->modelManager = $model;
         $this->db = $model->getDatabaseConnection();
     }
     
@@ -107,10 +113,12 @@ class RBFactory
      *   Limit rows - matches standard SQL format
      * @param bool $multi
      *   Is the expected output a single row (false) or multiple (true)?
+     * @param bool $array
+     *   Ignore subclass and force return type to be an array.
      */
-    public function get($arrayWhat, $arrayWhere, $order='', $limit='', $multi=true)
+    public function get($arrayWhat, $arrayWhere, $order='', $limit='', $multi=true, $array=false)
     {
-        if ($this->subClass) {
+        if ($this->subClass && !$array) {
             if ($multi) {
                 return $this->db->selectMultipleObjects($this->subClass, $this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
             }
