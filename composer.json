@@ -5,10 +5,17 @@
         "psr-4":
         {
             "rbwebdesigns\\core\\": "src",
-            "rbwebdesigns\\core\\model\\": "src/model"
         },
         "files": [
             "src/core-functions.php"
         ]
+    },
+    "require-dev": {
+        "pestphp/pest": "^1.22"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     }
 }

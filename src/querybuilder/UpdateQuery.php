@@ -69,9 +69,11 @@ class UpdateQuery {
 
         if (is_array($this->values) && count($this->values) > 0) {
             $values = array_values($this->values);
+            $fieldMapping = [];
             foreach (array_keys($this->values) as $key) {
-                $sql .= ' ' . $key . ' = ?';
+                $fieldMapping[] = '`' . $key . '` = ?';
             }
+            $sql .= implode(', ', $fieldMapping);
         }
         else {
             return false;

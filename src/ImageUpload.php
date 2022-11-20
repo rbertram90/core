@@ -131,7 +131,8 @@ class ImageUpload
      * @throws Exception With any error with upload
      */
     public function upload($uploadFolder, $fileName='') {
-        
+        $this->prepareUploadFolder($uploadFolder);
+
         // Validate
         if (!in_array($this->data['type'], $this->fileTypes)) {
             throw new \Exception("Unable to upload - {$this->data['type']} not in allowed file types list");
@@ -170,4 +171,9 @@ class ImageUpload
         return move_uploaded_file($this->data['tmp_name'], $this->data['new_path']);
     }
 
+    public function prepareUploadFolder($uploadFolder, $permissions = 0777) {
+        if (!is_dir($uploadFolder)) {
+            mkdir($uploadFolder, $permissions, true);
+        }
+    }
 }
