@@ -1,10 +1,8 @@
 {
     "name": "rbertram90/core",
-    "autoload":
-    {
-        "psr-4":
-        {
-            "rbwebdesigns\\core\\": "src",
+    "autoload": {
+        "psr-4": {
+            "rbwebdesigns\\core\\": "src"
         },
         "files": [
             "src/core-functions.php"
