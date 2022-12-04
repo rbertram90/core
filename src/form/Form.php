@@ -22,11 +22,6 @@ abstract class Form
     /** Encoding type attribute of the form */
     public string $encodingType = 'application/x-www-form-urlencoded';
 
-    /** Message from a failed submission */
-    public string $errorMessage = '';
-
-    public bool $showErrorMessage = false;
-
     /** Message from a successful submission */
     public string $successMessage = '';
 
@@ -47,10 +42,39 @@ abstract class Form
 
     /**
      * Form constructor
+     * 
+     * @param string $key
+     *   A string to represent the instance of the form on a page if there are
+     *   multiple instances, this will be used to generated the form ID and
+     *   identify the form instance when submitting data.
      */
-    public function __construct($id = null)
+    public function __construct($key = '')
     {
-        if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
+        // Identify that it is this class that is responsible for the POST
+        // allows multiple forms on the same page.
+        $requestMethod = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
+
+        $id = filter_input($requestMethod === 'POST' ? INPUT_POST : INPUT_GET, 'form_id');
+
+        // Currently ID does not include the path in so could have data come
+        // through from the same form on another page, as long as the form_id
+        // is passed in the query string.
+        $formId = __CLASS__;
+        if ($key) {
+            $formId .= '.' . $key;
+        }
+
+        $active = false;
+
+        if (is_string($id) && strlen($id) === 32) {
+            if (md5($formId) === $id) {
+                $active = true;
+            }
+        }
+
+        $this->id = md5($formId);
+
+        if ($requestMethod === 'POST' && $active) {
             $this->id = filter_input(INPUT_POST, 'form_id');
 
             if (method_exists(get_called_class(), 'preSubmit')) {
@@ -58,20 +82,17 @@ abstract class Form
             }
 
             $this->populateValuesFromPost();
+
+            $this->submit();
         }
         else {
-            if ($id = filter_input(INPUT_GET, 'form_id')) {
-                $this->id = $id;
+            if ($active) {
                 $this->populateValuesFromSession();
             }
-            elseif (filter_input(INPUT_GET, 'form_success')) {
+
+            if ($active && filter_input(INPUT_GET, 'form_success')) {
                 $this->showSuccessMessage = true;
             }
-            elseif (filter_input(INPUT_GET, 'form_error')) {
-                $this->showErrorMessage = false;
-            }
-
-            $this->id = $id ?: md5(uniqid('form_'));
         }
 
         $this->setAttribute('id', 'form_' . $this->id);
@@ -92,20 +113,6 @@ abstract class Form
     public function validate()
     {
         foreach ($this->fields as $key => $options) {
-            /*
-            switch ($options['type'] ?? null) {
-                case 'date':
-                    if (isset($options['value'])) {
-                        [$year, $month, $day] = explode('-', $options['value']);
-
-                        if (!checkdate(intval($month), intval($day), intval($year))) {
-                            $this->validationErrors[$key] = 'Invalid date';
-                        }
-                    }
-                    break;
-            }
-            */
-
             if (($options['required'] ?? false) && !$options['value']) {
                 $this->validationErrors[$key] = 'Required field';
             }
@@ -131,37 +138,36 @@ abstract class Form
 
     public function successRedirect()
     {
-        $queryStringPairs = explode('&', $_SERVER['QUERY_STRING']);
+        $queryString = $this->getQueryStringAsArray();
+
+        header('Location: ' . $_SERVER['PHP_SELF'] . '?' . ($queryString ? implode('&', $queryString) . '&' : '') . 'form_id=' . $this->id . '&form_success=1');
+    }
+
+    protected function getQueryStringAsArray()
+    {
+        $queryStringPairs = array_filter(explode('&', $_SERVER['QUERY_STRING']));
 
         $newQueryString = [];
 
         foreach ($queryStringPairs as $pair) {
             [$key, $value] = explode('=', $pair);
 
-            if ($key === 'form_id') {
+            if (in_array($key, ['form_id', 'form_success', 'form_error'])) {
                 continue;
             }
 
             $newQueryString[] = $key . '=' . $value;
         }
 
-        header('Location: ' . $_SERVER['PHP_SELF'] . '?' . ($newQueryString ? implode('&', $newQueryString) . '&' : '') . 'form_success=1');
-    }
-
-    public function errorRedirect()
-    {
-        if ($_SERVER['QUERY_STRING']) {
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'] . '&form_id=' . $this->id . '&form_error=1');
-        }
-        else {
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?form_id=' . $this->id . '&form_error=1');
-        }
+        return $newQueryString;
     }
 
     public function setRedirectBackToForm()
     {
-        if ($_SERVER['QUERY_STRING']) {
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'] . '&form_id=' . $this->id);
+        $queryString = $this->getQueryStringAsArray();
+
+        if ($queryString) {
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?' . implode('&', $queryString) . '&form_id=' . $this->id);
         }
         else {
             header('Location: ' . $_SERVER['PHP_SELF'] . '?form_id=' . $this->id);
@@ -256,21 +262,6 @@ abstract class Form
             if (isset($data[$key]) && ($value = $data[$key])) {
                 $this->fields[$key]['value'] = $value;
             }
-            /*
-            if ($type === 'date') {
-                [$year, $month, $day] = [
-                    $data[$key . '_y'],
-                    $data[$key . '_m'],
-                    $data[$key . '_d']
-                ];
-
-                if (!$year && !$month && !$day) {
-                    continue;
-                }
-
-                $this->fields[$key]['value'] = $year . '-' . $month . '-' . $day;
-            }
-            */
         }
     }
 
@@ -396,12 +387,8 @@ abstract class Form
 
         $output = "<form{$attributes}>" . PHP_EOL;
 
-        if ($this->showErrorMessage && $this->errorMessage) {
-            $output.= '<p class="message error">'. $this->error .'</p>';
-        }
-
         if ($this->showSuccessMessage && $this->successMessage) {
-            $output.= '<p class="message success">'. $this->successMessage .'</p>';
+            $output.= '<div class="message success">'. $this->successMessage .'</div>';
         }
 
         $output.= implode(PHP_EOL, $fieldOutput);

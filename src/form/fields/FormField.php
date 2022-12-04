@@ -100,8 +100,8 @@ abstract class FormField implements FormFieldInterface
         return count($this->errors) > 0;
     }
 
-    public function setErrors(array $errors) {
-        $this->errors = $errors;
+    public function setErrors(string $error) {
+        $this->errors = [$error];
 
         return $this;
     }

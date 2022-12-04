@@ -1,9 +1,11 @@
 <?php
 	use rbwebdesigns\core\Form\Form;
 
+	session_start();
+
 	$root = __DIR__ . "/../src";
 
-	require_once $root . '/HTMLElementTrait.php';
+	require_once $root . '/traits/HTMLElement.php';
 	require_once $root . '/form/Form.php';
 	require_once $root . '/form/InvalidFieldDefinitionException.php';
 	require_once $root . '/form/fields/FormFieldInterface.php';
@@ -20,6 +22,46 @@
 	require_once $root . '/form/fields/UploadField.php';
 	require_once $root . '/form/fields/RangeField.php';
 	require_once $root . '/form/fields/ColourField.php';
+
+	class TestForm2 extends Form
+	{
+		protected array $fields = [
+			'name' => [
+				'required' => true,
+			],
+		];
+
+		protected array $actions = [
+			['label' => 'Submit'],
+		];
+
+		public string $successMessage = 'Form was successfully submitted';
+
+		public function saveData() {
+			$debug = "Saved data: " . time() . PHP_EOL;
+			$debug .= "Name = " . $this->fields['name']['value'];
+
+			if (file_put_contents(__DIR__ . '/data/submission.txt', $debug)) {
+				$this->successRedirect();
+			}
+			else {
+				$this->setRedirectBackToForm();
+			}
+		}
+
+		public function validate() {
+			parent::validate();
+
+			if ($this->fields['name']['value'] === 'nope') {
+				$this->validationErrors['name'] = "Try again";
+			}
+
+			return count($this->validationErrors) === 0;
+		}
+	}
+
+	$form2_1 = new TestForm2('user_1');
+	$form2_2 = new TestForm2('user_2');
 ?>
 <!DOCTYPE html>
 <html>
@@ -32,7 +74,8 @@
 	</style>
 </head>
 <body>
-	<h1>Form Field examples</h1>
+	<h1>Form examples</h1>
+	<h2>Field types</h2>
 <?php
 	class TestForm extends Form
 	{
@@ -139,8 +182,8 @@
 
 	$form->output(true);
 ?>
+<h2>Conditional visibility</h2>
 <?php
-
 	$form = new TestForm();
 
 	$form->addField('choices', [
@@ -162,5 +205,12 @@
 
 	$form->output(true);
 ?>
+
+<h2>Processing form data</h2>
+<?php $form2_1->output(true); ?>
+
+<h2>Same form, second instance</h2>
+<?php $form2_2->output(true); ?>
+
 </body>
 </html>
