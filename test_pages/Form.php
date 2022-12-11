@@ -7,6 +7,7 @@
 
 	require_once $root . '/traits/HTMLElement.php';
 	require_once $root . '/form/Form.php';
+	require_once $root . '/form/Action.php';
 	require_once $root . '/form/InvalidFieldDefinitionException.php';
 	require_once $root . '/form/fields/FormFieldInterface.php';
 	require_once $root . '/form/fields/FormField.php';
@@ -184,7 +185,7 @@
 ?>
 <h2>Conditional visibility</h2>
 <?php
-	$form = new TestForm();
+	$form = new TestForm('conditional_visibility');
 
 	$form->addField('choices', [
 		'label' => 'Show or hide the field below',
