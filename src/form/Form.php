@@ -30,7 +30,6 @@ abstract class Form
     /** Result of running the validation method */
     public bool $isValid = true;
 
-
     /** Errors found during data validation. */
     protected array $validationErrors = [];
 
@@ -45,18 +44,16 @@ abstract class Form
      * 
      * @param string $key
      *   A string to represent the instance of the form on a page if there are
-     *   multiple instances, this will be used to generated the form ID and
+     *   multiple instances, this will be used to generate the form ID and
      *   identify the form instance when submitting data.
      */
     public function __construct($key = '')
     {
-        // Identify that it is this class that is responsible for the POST
-        // allows multiple forms on the same page.
         $requestMethod = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
 
         $id = filter_input($requestMethod === 'POST' ? INPUT_POST : INPUT_GET, 'form_id');
 
-        // Currently ID does not include the path in so could have data come
+        // Currently ID does not include the URL path, could have data come
         // through from the same form on another page, as long as the form_id
         // is passed in the query string.
         $formId = __CLASS__;
@@ -64,6 +61,7 @@ abstract class Form
             $formId .= '.' . $key;
         }
 
+        // Identify if it's this form that is responsible for the POST.
         $active = false;
 
         if (is_string($id) && strlen($id) === 32) {
@@ -85,12 +83,10 @@ abstract class Form
 
             $this->submit();
         }
-        else {
-            if ($active) {
-                $this->populateValuesFromSession();
-            }
+        elseif ($active) {
+            $this->populateValuesFromSession();
 
-            if ($active && filter_input(INPUT_GET, 'form_success')) {
+            if (filter_input(INPUT_GET, 'form_success')) {
                 $this->showSuccessMessage = true;
             }
         }
@@ -143,25 +139,39 @@ abstract class Form
         header('Location: ' . $_SERVER['PHP_SELF'] . '?' . ($queryString ? implode('&', $queryString) . '&' : '') . 'form_id=' . $this->id . '&form_success=1');
     }
 
-    protected function getQueryStringAsArray()
+    /**
+     * Get $_SERVER['QUERY_STRING'] as an array, without form related variables.
+     */
+    protected function getQueryStringAsArray($queryString = null)
     {
-        $queryStringPairs = array_filter(explode('&', $_SERVER['QUERY_STRING']));
+        parse_str($queryString ?: $_SERVER['QUERY_STRING'], $queryStringArray);
 
-        $newQueryString = [];
+        unset($queryStringArray['form_id']);
+        unset($queryStringArray['form_success']);
+        unset($queryStringArray['form_error']);
 
-        foreach ($queryStringPairs as $pair) {
-            [$key, $value] = explode('=', $pair);
-
-            if (in_array($key, ['form_id', 'form_success', 'form_error'])) {
-                continue;
-            }
-
-            $newQueryString[] = $key . '=' . $value;
-        }
-
-        return $newQueryString;
+        return $queryStringArray;
     }
 
+    /**
+     * Takes a key value pair array and turn it into "&" separated
+     * string of key=value pairs
+     */
+    protected function implodeQueryStringArray($array)
+    {
+        $queryString = [];
+
+        foreach ($array as $key => $value) {
+            $queryString[] = "$key=$value";
+        }
+
+        return implode('&', $queryString);
+    }
+
+    /**
+     * Default implementation of a redirect back to the form page,
+     * called when server-side validation fails.
+     */
     public function setRedirectBackToForm()
     {
         $queryString = $this->getQueryStringAsArray();
@@ -175,9 +185,9 @@ abstract class Form
     }
 
     /**
-     * We cannot provide implementation of the submit
-     * method here as we don't know how the data is
-     * to be saved.
+     * This function is to be implemented on a form-by-form basis, this
+     * is where the business logic for the submission of the form should
+     * occur.
      */
     abstract protected function saveData();
 
@@ -388,7 +398,7 @@ abstract class Form
         $output = "<form{$attributes}>" . PHP_EOL;
 
         if ($this->showSuccessMessage && $this->successMessage) {
-            $output.= '<div class="message success">'. $this->successMessage .'</div>';
+            $output.= $this->formatSuccessMessage();
         }
 
         $output.= implode(PHP_EOL, $fieldOutput);
@@ -405,6 +415,14 @@ abstract class Form
 
         if ($print) echo $output;
         else return $output;
+    }
+
+    /**
+     * Format the HTML that will be shown for the success message.
+     */
+    public function formatSuccessMessage()
+    {
+        return '<div class="message success">'. $this->successMessage .'</div>';
     }
 
     /**
