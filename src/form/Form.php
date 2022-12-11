@@ -136,7 +136,7 @@ abstract class Form
     {
         $queryString = $this->getQueryStringAsArray();
 
-        header('Location: ' . $_SERVER['PHP_SELF'] . '?' . ($queryString ? implode('&', $queryString) . '&' : '') . 'form_id=' . $this->id . '&form_success=1');
+        header('Location: ' . $_SERVER['PHP_SELF'] . '?' . ($queryString ? $this->implodeQueryStringArray($queryString) . '&' : '') . 'form_id=' . $this->id . '&form_success=1');
     }
 
     /**
@@ -177,7 +177,7 @@ abstract class Form
         $queryString = $this->getQueryStringAsArray();
 
         if ($queryString) {
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?' . implode('&', $queryString) . '&form_id=' . $this->id);
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $this->implodeQueryStringArray($queryString) . '&form_id=' . $this->id);
         }
         else {
             header('Location: ' . $_SERVER['PHP_SELF'] . '?form_id=' . $this->id);
