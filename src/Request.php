@@ -10,8 +10,8 @@ namespace rbwebdesigns\core;
  */
 class Request
 {
-
     protected $urlParameters;
+    
     protected $controller;
 
     public $isAjax = false;
@@ -50,11 +50,11 @@ class Request
     }
 
     /**
-     * @return string request path
+     * @return string request path without query string.
      */
     public function path()
     {
-        return $_SERVER['REQUEST_URI'];
+        return explode('?', $_SERVER['REQUEST_URI'])[0];
     }
 
     /**
