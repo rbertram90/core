@@ -403,10 +403,8 @@ abstract class Form
 
         $output.= implode(PHP_EOL, $fieldOutput);
 
-        foreach ($this->actions ?? [] as $action) {
-            $attributes = $this->outputAttributes($action);
-            if (array_key_exists('type', $action)) $attributes .= " type='{$action['type']}'";
-            $output.= "<button{$attributes}>{$action['label']}</button>";
+        foreach ($this->actions ?? [] as $actionConfig) {
+            $output .= (new Action($actionConfig))->render();
         }
 
         $output .= "<input type='hidden' name='form_id' value='{$this->id}'>";
