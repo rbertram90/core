@@ -14,6 +14,7 @@ class Response
 {
     protected $scripts = [];
     protected $stylesheets = [];
+    protected $meta = [];
     protected $variables = [];
     protected $body = "";
 
@@ -41,6 +42,7 @@ class Response
 
         $scripts = $this->prepareScripts();
         $stylesheets = $this->prepareStylesheets();
+        $meta = $this->prepareMeta();
         $output = $this->body;
         $currentUser = $session->currentUser;
         $messages = $session->getAllMessages();
@@ -94,6 +96,25 @@ class Response
     public function setDescription($description)
     {
         $this->setVar('page_description', $description);
+    }
+
+    /**
+     * Add a meta tag.
+     */
+    public function addMeta($name, $content)
+    {
+        $this->meta[$name] = $content;
+    }
+
+    protected function prepareMeta()
+    {
+        $markup = '';
+
+        foreach($this->meta as $name => $content) {
+            $markup .= "<meta name=\"$name\" content=\"$content\">" . PHP_EOL;
+        }
+
+        return $markup;
     }
 
     /**
@@ -199,4 +220,5 @@ class Response
     {
         header("{$name}: {$value}");
     }
+
 }
