@@ -1,7 +1,7 @@
 <?php
 namespace rbwebdesigns\core\account;
 
-use rbwebdesigns\core\Form;
+use rbwebdesigns\core\form\Form;
 
 /**
  * class LoginForm
@@ -16,36 +16,24 @@ use rbwebdesigns\core\Form;
  */
 abstract class LoginForm extends Form
 {
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->action = '/account/login';
-        $this->method = 'POST';
-        $this->submitLabel = 'Log in';
-        $this->fields = [
-            'username' => [
-                'before' => '',
-                'after' => '',
-                'label' => 'Username',
-                'type' => 'text',
-                'required' => true
-            ],
-            'password' => [
-                'before' => '',
-                'after' => '',
-                'label' => 'Password',
-                'type' => 'password',
-                'required' => true
-            ]
-        ];
-        $this->actions = [
-            [
-                'type' => 'submit',
-                'label' => 'Log in',
-            ]
-        ];
-        $this->setAttribute('id', 'form_login');
-    }
-
+    public string $action = '/account/login';
+    public string $method = 'POST';
+    public array $fields = [
+        'username' => [
+            'label' => 'Username',
+            'type' => 'text',
+            'required' => true
+        ],
+        'password' => [
+            'label' => 'Password',
+            'type' => 'password',
+            'required' => true
+        ]
+    ];
+    public array $actions = [
+        [
+            'type' => 'submit',
+            'label' => 'Log in',
+        ]
+    ];
 }
