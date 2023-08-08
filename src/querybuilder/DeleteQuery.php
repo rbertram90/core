@@ -2,7 +2,7 @@
 
 namespace rbwebdesigns\core\querybuilder;
 
-class SelectQuery {
+class DeleteQuery {
 
     /** @var string */
     protected $table;
@@ -12,9 +12,6 @@ class SelectQuery {
 
     /** @var string[][] */
     protected $joins = [];
-
-    /** @var string[] */
-    protected $fields = [];
 
     /** @var \rbwebdesigns\core\querybuilder\SelectQuery[] */
     protected $selectSubqueries = [];
@@ -30,9 +27,6 @@ class SelectQuery {
 
     /** @var string */
     protected $orderByDirection = 'ASC';
-
-    /** @var string[] */
-    protected $groupBy = [];
 
     /** @var bool|int */
     protected $limit = false;
@@ -51,58 +45,18 @@ class SelectQuery {
         $this->database = $database;
     }
 
-    /**
-     * @param string[] $fields
-     * 
-     * @return self
-     */
-    public function fields(array $fields) {
-        $this->fields = $fields;
-        return $this;
-    }
-
-    /**
-     * @param string $field
-     * 
-     * @return self
-     */
-    public function addField(string $field) {
-        $this->fields[] = $field;
-        return $this;
-    }
-
-    /**
-     * @param SelectQuery $query
-     * 
-     * @return self
-     */
-    public function selectSubquery(SelectQuery $query) {
+    public function selectSubquery(SelectQuery $query): self {
         $this->selectSubqueries[] = $query;
         return $this;
     }
 
-    /**
-     * @param string $name
-     * @param string $value
-     * @param string $operator
-     * 
-     * @return self
-     */
-    public function condition(string $name, $value, string $operator = QueryCondition::EQUALS_OPERATOR) {
+    public function condition(string $name, mixed $value, string $operator = QueryCondition::EQUALS_OPERATOR): self {
         $condition = new QueryCondition();
         $condition->name = $name;
         $condition->value = $value;
         $condition->operator = $operator;
 
         $this->conditions[] = $condition;
-        return $this;
-    }
-
-    /**
-     * @return self
-     */
-    public function groupBy($field) {
-        $this->groupBy[] = $field;
         return $this;
     }
     
@@ -196,20 +150,9 @@ class SelectQuery {
      * 
      * @return string
      */
-    public function __toString() {
-        if (is_array($this->fields) && count($this->fields) > 0) {
-            $fields = implode(',', $this->fields);
-        }
-        else {
-            $fields = '*';
-        }
-
-        foreach ($this->selectSubqueries as $subquery) {
-            $fields .= ', (' . $subquery->sql() . ')';
-        }
-        
+    public function __toString() {        
         $alias = strlen($this->alias) ? ' AS ' . $this->alias : '';
-        $sql = "SELECT {$fields} FROM {$this->table}{$alias}";
+        $sql = "DELETE FROM {$this->table}{$alias}";
 
         foreach ($this->joins as $joinType => $joins) {
             foreach ($joins as $join) {
@@ -234,10 +177,6 @@ class SelectQuery {
         if (count($this->conditions) > 0) {
             $this->conditions = array_map('strval', $this->conditions);
             $sql .= ' WHERE ' . implode(' AND ', $this->conditions);
-        }
-
-        if (count($this->groupBy)) {
-            $sql .= ' GROUP BY ' . implode(',', $this->groupBy);
         }
 
         if (strlen($this->orderByField)) {

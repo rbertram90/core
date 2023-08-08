@@ -9,7 +9,7 @@ class InsertQuery {
 
     protected $table;
     protected $values = [];
-    protected $database;
+    protected Database $database;
 
     /**
      * @param rbwebdesigns\core\querybuilder\Database $database

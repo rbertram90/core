@@ -4,11 +4,11 @@ namespace rbwebdesigns\core\querybuilder;
 
 class Database {
 
-    /** @var \PDO $connection */
-    protected $connection;
+    protected \PDO $connection;
 
-    /** @var \PDOStatement|bool $statement */
-    protected $statement = false;
+    protected \PDOStatement|bool $statement = false;
+
+    protected array $config;
 
     /**
      * @param string[] $config
@@ -67,6 +67,13 @@ class Database {
      */
     public function insert(string $table) {
         return new InsertQuery($this, $table);
+    }
+
+    /**
+     * Create a delete query on the database
+     */
+    public function delete(string $table) {
+        return new DeleteQuery($this, $table);
     }
 
     /**
