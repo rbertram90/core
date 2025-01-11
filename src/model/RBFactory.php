@@ -1,6 +1,7 @@
 <?php
 namespace rbwebdesigns\core\model;
 
+use rbwebdesigns\core\ObjectDatabase;
 use rbwebdesigns\core\Sanitize;
 
 /**
@@ -30,13 +31,9 @@ use rbwebdesigns\core\Sanitize;
 class RBFactory
 {
     /**
-     * @var \rbwebdesigns\core\ObjectDatabase
+     * @var string Name of the table for which this model factory primarily relates.
      */
-    protected $db;
-    /**
-     * @var string Name of the table for which this model primarily relates
-     */
-    protected $tableName;
+    protected string $tableName;
     /**
      * @var array List of the database fields and their associated datatypes
      */
@@ -46,19 +43,7 @@ class RBFactory
      */
     protected $subClass;
 
-    /**
-     * @var \rbwebdesigns\core\model\ModelManager
-     */
-    protected $modelManager;
-
-    /**
-     * @param \rbwebdesigns\core\model\ModelManager $model
-     */
-    public function __construct($model)
-    {
-        $this->modelManager = $model;
-        $this->db = $model->getDatabaseConnection();
-    }
+    public function __construct(protected ObjectDatabase $db) {}
     
     /**
      * @return array

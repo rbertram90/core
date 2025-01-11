@@ -18,9 +18,10 @@ class ServiceContainer
     /**
      * Register a single service.
      */
-    public function registerService(string $name, string $className) {
+    public function registerService(string $name, string $className, array $arguments = []) {
         $this->services[$name] = [
-            'class' => $className
+            'class' => $className,
+            'args' => $arguments,
         ];
     }
 
@@ -41,6 +42,10 @@ class ServiceContainer
 
     /**
      * Get a service by it's class name.
+     * 
+     * @todo Is this viable?
+     * Can we actually convert parameter types to services when it's not the
+     * actual class, e.g. interfaces?
      */
     public function getClass(string $className) {
         $arguments = $this->getArguments($className);
@@ -68,7 +73,11 @@ class ServiceContainer
             throw new \Exception("Unable to create service: Class {$service['class']} does not exist.");
         }
 
-        $args = $this->getArguments($service['class']);
+        $args = [];
+
+        foreach ($service['args'] ?? [] as $argument) {
+            $args[] = $this->get($argument);
+        }
 
         $this->services[$serviceName]['instance'] = new $service['class'](...$args);
     }

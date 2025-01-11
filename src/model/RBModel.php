@@ -1,6 +1,8 @@
 <?php
 namespace rbwebdesigns\core\model;
 
+use rbwebdesigns\core\ObjectDatabase;
+
 /**
  * core/model/RBModel.php
  * @author: R Bertram <ricky@rbwebdesigns.co.uk>
@@ -25,24 +27,23 @@ namespace rbwebdesigns\core\model;
  *       'male' => 'boolean'
  *   );
  */
-class RBModel
+abstract class RBModel
 {
-    protected $db;
-    protected $tableName;
-    protected $fields;
+    public string $identifier = 'id';
+
+    public function __construct(protected ObjectDatabase $db) {}
 
     /**
-     * @param rbwebdesigns\core\model\ModelManager $model
+     * Get the table name for this model.
      */
-    public function __construct($model) {
-        // These MUST be overridden...
-        $this->db = $model->getDatabaseConnection();
-        $this->fields = [];
-        $this->tblname = $tableName;
-    }
+    public abstract function tableName(): string;
 
-    public function delete($arrayWhere) {
-        return $this->db->deleteRow($this->tblname, $arrayWhere);
+    /**
+     * Delete this model.
+     */
+    public function delete()
+    {
+        return $this->db->deleteRow($this->tableName(), [$this->identifier => $this->{$this->identifier}]);
     }
     
 }

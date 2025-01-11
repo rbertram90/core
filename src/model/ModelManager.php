@@ -3,6 +3,9 @@ namespace rbwebdesigns\core\model;
 
 use rbwebdesigns\core\Database;
 
+/**
+ * @deprecated This has been replaced by ServiceContainer.
+ */
 class ModelManager
 {
     protected $models;
