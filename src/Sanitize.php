@@ -16,7 +16,7 @@ class Sanitize
 	 */
 	public static function string($string)
 	{
-		return filter_var($string, FILTER_SANITIZE_STRING);
+		return filter_var($string, FILTER_SANITIZE_ADD_SLASHES);
 	}
 	
 	/**
