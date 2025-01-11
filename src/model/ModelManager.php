@@ -7,6 +7,8 @@ class ModelManager
 {
     protected $models;
     protected static $instances = [];
+    protected $databaseConnection;
+    protected $name;
 
     /**
      * ModelManager constructor.
@@ -62,7 +64,7 @@ class ModelManager
     /**
      * Get the database class
      * 
-     * @return rbwebdesigns\core\Database|object
+     * @return \rbwebdesigns\core\Database|object
      */
     public function getDatabaseConnection()
     {

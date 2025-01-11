@@ -165,7 +165,7 @@ class HTMLFormTools
     
     public function addHelpTextIcon($strHelp) {
                 
-        return '<a href="/" onclick="alert(\''.filter_var($strHelp, FILTER_SANITIZE_STRING).'\'); return false;" class="help">[?]</a>';
+        return '<a href="/" onclick="alert(\''.filter_var($strHelp, FILTER_SANITIZE_ADD_SLASHES).'\'); return false;" class="help">[?]</a>';
     }
     
     /**
