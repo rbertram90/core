@@ -2,17 +2,27 @@
 
 namespace rbwebdesigns\core;
 
+use ReflectionClass;
+
+/**
+ * Service container.
+ * 
+ * Get services without having to new up classes each time.
+ * This is a basic mapping between a name and a class name we dynamically
+ * fetch the list of parameters a class constructor has.
+ */
 class ServiceContainer
 {
+    public function __construct(protected array $services) {}
+
     /**
-     * @var array<string,array<string,mixed>>
+     * Register a single service.
      */
-    protected $services = [
-        'database' => [
-            'class' => ObjectDatabase::class,
-            'args' => [],
-        ],
-    ];
+    public function registerService(string $name, string $className) {
+        $this->services[$name] = [
+            'class' => $className
+        ];
+    }
 
     /**
      * Get a service instance by it's name.
@@ -29,18 +39,61 @@ class ServiceContainer
         return $this->services[$serviceName]['instance'];
     }
 
+    /**
+     * Get a service by it's class name.
+     */
+    public function getClass(string $className) {
+        $arguments = $this->getArguments($className);
+
+        return new $className(...$arguments);
+    }
+
+    protected function getServiceName(string $className) {
+        $map = array_combine(
+            array_column($this->services, 'class'),
+            array_keys($this->services),
+        );
+
+        if (! isset($map[$className])) {
+            throw new \Exception("Unable to find service with class: $className");
+        }
+
+        return $map[$className];
+    }
+
     protected function initialiseService(string $serviceName) {
         $service = $this->services[$serviceName];
-        $args = [];
 
         if (! class_exists($service['class'])) {
             throw new \Exception("Unable to create service: Class {$service['class']} does not exist.");
         }
 
-        foreach ($service['args'] as $argument) {
-            $args[] = $this->get($argument);
-        }
+        $args = $this->getArguments($service['class']);
 
         $this->services[$serviceName]['instance'] = new $service['class'](...$args);
+    }
+
+    protected function getArguments(string $class) {
+        $reflectionClass = new ReflectionClass($class);
+
+        $parameters = $reflectionClass->getConstructor()?->getParameters();
+
+        if (! is_array($parameters)) {
+            return [];
+        }
+
+        $arguments = [];
+
+        foreach ($parameters as $parameter) {
+            $type = (string) $parameter->getType();
+
+            if (class_exists($type)) {
+                $parameterServiceName = $this->getServiceName($type);
+                $arguments[] = $this->get($parameterServiceName);
+                continue;
+            }
+        }
+
+        return $arguments;
     }
 }
