@@ -2,11 +2,11 @@
 namespace rbwebdesigns\core;
 
 use rbwebdesigns\core\Response;
+use Twig\TemplateWrapper;
 
 class TwigResponse extends Response
 {
     protected $twig;
-    protected $templateVarables;
 
     public function __construct($templateDirectory, $cacheDirectory)
     {
@@ -14,7 +14,14 @@ class TwigResponse extends Response
         $this->twig = new \Twig\Environment($loader, [
             'cache' => $cacheDirectory,
         ]);
-        $this->templateVarables = [];
+    }
+
+    /**
+     * Get the processed twig content without printing.
+     */
+    public function render(string|TemplateWrapper $templatePath): string
+    {
+        return $this->twig->render($templatePath, $this->variables);
     }
 
     /**
@@ -22,7 +29,7 @@ class TwigResponse extends Response
      */
     public function write($templatePath)
     {
-        print $this->twig->render($templatePath, $this->templateVarables);
+        print $this->twig->render($templatePath, $this->variables);
     }
 
     /**
@@ -33,19 +40,12 @@ class TwigResponse extends Response
         // $currentUser = $session->currentUser;
         // $messages = $session->getAllMessages();
 
-        print $this->twig->render($templatePath, array_merge($this->templateVarables, [
+        print $this->twig->render($templatePath, [
+            ...$this->variables,
             'scripts' => $this->prepareScripts(),
             'stylesheets' => $this->prepareStylesheets(),
             'content' => $this->body
-        ]));
-    }
-
-    /**
-     * Overwrites default to use Twig templates
-     */
-    public function setVar($name, $value)
-    {
-        $this->templateVarables[$name] = $value;
+        ]);
     }
 
     /**
@@ -62,6 +62,5 @@ class TwigResponse extends Response
     public function enableAutoReload() {
         $this->twig->enableAutoReload();
     }
-
 
 }
