@@ -26,7 +26,23 @@ class Response
         $this->variables[$name] = $value;
     }
 
-    public function getVar($name) {
+    /**
+     * Set many variables in one call.
+     * @param array $values Associative array of variable key, value
+     * @return self
+     */
+    public function setVars(array $values): self
+    {
+        $this->variables = [
+            ...$this->variables,
+            ...$values,
+        ];
+
+        return $this;
+    }
+
+    public function getVar($name)
+    {
         if (array_key_exists($name, $this->variables)) {
             return $this->variables[$name];
         }
@@ -180,7 +196,7 @@ class Response
     {
         $styleMarkup = '';
 
-        foreach($this->stylesheets as $stylesheet) {
+        foreach ($this->stylesheets as $stylesheet) {
             $styleMarkup .= '<link rel="stylesheet" type="text/css" href="' . $stylesheet . '">' . PHP_EOL;
         }
 
@@ -195,7 +211,7 @@ class Response
      */
     public function redirect($location, $message = '', $messageType = 'info')
     {
-        if(strlen($message) > 0) {
+        if (strlen($message) > 0) {
             Session::addMessage($message, $messageType);
         }
         session_write_close();
