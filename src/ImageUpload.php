@@ -120,9 +120,9 @@ class ImageUpload
 		echo "<pre>".print_r($_FILES)."</pre>";
     }
     
-    public function createFileName($psPrefix = "", $psSuffix = "") {
-        $lsFileName = $psPrefix.rand(10000,32000).rand(10000,32000).$psSuffix.'.'.pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
-        return strtolower($lsFileName);
+    public function createFileName($prefix = "", $suffix = "") {
+        $fileName = $prefix.rand(10000,32000).rand(10000,32000).$suffix.'.'.pathinfo($this->data['name'], PATHINFO_EXTENSION);
+        return strtolower($fileName);
     }
     
     /**
