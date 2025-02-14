@@ -2,6 +2,7 @@
 namespace rbwebdesigns\core\model;
 
 use rbwebdesigns\core\ObjectDatabase;
+use rbwebdesigns\macscomputers\App;
 
 /**
  * core/model/RBModel.php
@@ -29,21 +30,35 @@ use rbwebdesigns\core\ObjectDatabase;
  */
 abstract class RBModel
 {
-    public string $identifier = 'id';
+    /**
+     * Field name for the primary key.
+     */
+    public static string $identifier = 'id';
 
     public function __construct(protected ObjectDatabase $db) {}
 
     /**
      * Get the table name for this model.
      */
-    public abstract function tableName(): string;
+    public static abstract function tableName(): string;
+
+    /**
+     * Load an instance of the model by it's primary key.
+     */
+    public static function load(string|int $id): static
+    {
+        /** @var \rbwebdesigns\core\ObjectDatabase */
+        $db = App::container()->get('database');
+
+        return $db->selectSingleObject(static::class, static::tableName(), '*', [static::$identifier => $id]);
+    }
 
     /**
      * Delete this model.
      */
     public function delete()
     {
-        return $this->db->deleteRow($this->tableName(), [$this->identifier => $this->{$this->identifier}]);
+        return $this->db->deleteRow(static::tableName(), [static::$identifier => $this->{static::$identifier}]);
     }
     
 }

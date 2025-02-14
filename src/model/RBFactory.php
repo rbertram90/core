@@ -78,7 +78,7 @@ class RBFactory
      */
     public function getCount($arrayWhere = '')
     {
-        if(getType($arrayWhere) == 'array') {
+        if (getType($arrayWhere) == 'array') {
             return $this->db->countRows($this->tableName, $arrayWhere);
         } else {
             return $this->db->countRows($this->tableName);
