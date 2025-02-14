@@ -1,0 +1,27 @@
+<?php
+
+namespace rbwebdesigns\core\HTMx;
+
+/**
+ * A dead simple link.
+ */
+class HTMxTableAction implements HTMXTableActionInterface
+{
+    /**
+     * @var callable
+     */
+    protected $urlCallback;
+
+    /**
+     * Create a new table action.
+     * @param string|Callable(array) $url Url string, or callback for the link href.
+     * @param string $label Text of the link.
+     */
+    public function __construct(public $url, public string $label) {}
+
+    public function render(array $item): string
+    {
+        return '<a href="'.$this->url.'">'.$this->label.'</a>';
+    }
+
+}
