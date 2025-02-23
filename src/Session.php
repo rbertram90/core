@@ -7,7 +7,7 @@ namespace rbwebdesigns\core;
  */
 class Session
 {
-    public $currentUser = null;
+    public ?array $currentUser = null;
 
     /**
      * Start the session

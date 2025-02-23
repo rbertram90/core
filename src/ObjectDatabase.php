@@ -25,6 +25,7 @@ class ObjectDatabase extends Database
     public function selectSingleObject($className, $tableName, $columns, $where, $orderBy='', $limit='')
     {
         $queryString = $this->prepareSimpleSelect($tableName, $columns, $where, $orderBy, $limit);
+
         return $this->query($queryString)->fetchObject($className);
     }
 

@@ -6,7 +6,7 @@ class HTMxTableDialogAction implements HTMXTableActionInterface
 {
     public function __construct(public $url, public string $label) {}
 
-    public function render(array $item): string
+    public function render(array|object $item): string
     {
         $url = $this->url;
         if (is_callable($this->url)) {

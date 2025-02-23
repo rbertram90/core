@@ -14,14 +14,19 @@ class HTMxTableAction implements HTMXTableActionInterface
 
     /**
      * Create a new table action.
-     * @param string|Callable(array) $url Url string, or callback for the link href.
+     * @param string|Callable(array|object) $url Url string, or callback for the link href.
      * @param string $label Text of the link.
      */
     public function __construct(public $url, public string $label) {}
 
-    public function render(array $item): string
+    public function render(array|object $item): string
     {
-        return '<a href="'.$this->url.'">'.$this->label.'</a>';
+        $url = $this->url;
+        if (is_callable($this->url)) {
+            $url = ($this->url)($item);
+        }
+
+        return '<a href="'.$url.'">'.$this->label.'</a>';
     }
 
 }

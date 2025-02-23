@@ -1,16 +1,9 @@
 <?php
-namespace rbwebdesigns\core;
 
-/**
- * Class DateFormatter
- */
+namespace rbwebdesigns\core;
 
 class DateFormatter
 {
-    public function __construct()
-    {
-    }
-    
     /**
      * function getAgeInYears
      * @param date <string> DD-MM-YYYY
@@ -25,7 +18,7 @@ class DateFormatter
         // Find the difference in years
         $targetDate = date("Y") - $targetYear;
 
-        if($targetMonthDay > $currentMonthDay) {
+        if ($targetMonthDay > $currentMonthDay) {
             // If months are not equal
             $targetDate--;
         }
@@ -160,4 +153,3 @@ class DateFormatter
         return date($format, strtotime($time));
     }
 }
-?>

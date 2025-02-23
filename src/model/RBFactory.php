@@ -1,6 +1,8 @@
 <?php
 namespace rbwebdesigns\core\model;
 
+use PDOException;
+use Exception;
 use rbwebdesigns\core\ObjectDatabase;
 use rbwebdesigns\core\Sanitize;
 
@@ -119,10 +121,20 @@ class RBFactory
             return $this->db->selectSingleRow($this->tableName, $arrayWhat, $arrayWhere, $order, $limit);
         }
     }
-    
-    public function insert($arrayWhat)
+
+    /**
+     * Insert row for this model.
+     * @param mixed $arrayWhat Model data.
+     * @return string|false ID of the last inserted row, or
+     *  false if insert failed.
+     * @throws PDOException 
+     * @throws Exception 
+     */
+    public function insert($arrayWhat): string|false
     {
-        return $this->db->insertRow($this->tableName, $arrayWhat);
+        return $this->db->insertRow($this->tableName, $arrayWhat)
+            ? $this->db->getLastInsertID()
+            : false;
     }
     
     public function update($arrayWhere, $arrayWhat)

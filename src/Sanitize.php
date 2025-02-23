@@ -16,9 +16,9 @@ class Sanitize
 	 */
 	public static function string($string)
 	{
-		return filter_var($string, FILTER_SANITIZE_ADD_SLASHES);
+		return filter_var($string, FILTER_SANITIZE_SPECIAL_CHARS);
 	}
-	
+
 	/**
 	 * Sanitize a blob upload
 	 */

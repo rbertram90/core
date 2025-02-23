@@ -11,7 +11,7 @@ class ImageUpload
     public $maxUploadSize;
     public $fileTypes;
 	
-    public function __construct($fileData)
+    public function __construct(array $fileData)
     {
         $this->data = $fileData;
         $this->maxUploadSize = 1000000; // 1 MB
@@ -30,6 +30,8 @@ class ImageUpload
      * Create a resized image from original upload
      * 
      * createThumbnail($user_image_folder."/square/", 300, 300);
+     * 
+     * @return boolean If image was created successfully.
      */
     public function createThumbnail($destinationPath, $newFilename='', $thumbWidth=300, $thumbHeight=300)
     {

@@ -71,23 +71,24 @@ abstract class HTMxTable
     {
         $header = $links = "";
         $actions = $this->getActions();
-
+        
         foreach ($this->getColumns() as $column) {
             $header .= "<th>$column</th>";
         }
-
+        
         if (count($actions) > 0) {
             // Add an extra column.
             $header .= "<th></th>";
         }
-
+        
         for ($i = 1; $i <= floor($this->getTotalRows() / 20) + 1; $i++) {
             $url = $this->getPaginationUrl($i);
             $links .= "<button hx-get=\"$url\" hx-target=\"#{$this->id} tbody\">$i</button>";
         }
-
+        
         $initialContent = $this->getPageData($this->perPage, 1);
         $formattedInitialRows = [];
+
         foreach ($initialContent as $item) {
             $formattedRow = $this->formatRow($item);
             if (is_array($formattedRow)) {

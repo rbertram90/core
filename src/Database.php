@@ -193,9 +193,14 @@ class Database
         
         // Conditions
         if (is_array($where)) {
-            if (count($where)) $where = ' WHERE '. $this->createWhereStatement($where);
+            if (count($where) > 0) {
+                $where = ' WHERE '. $this->createWhereStatement($where);
+            }
+            else {
+                $where = '';
+            }
         }
-        elseif (strlen($where > 0)) $where = ' WHERE ' . $where;
+        elseif (strlen($where) > 0) $where = ' WHERE ' . $where;
 
 		// Order
 		if (strlen($orderBy) > 0) $orderBy = ' ORDER BY ' . $orderBy;

@@ -21,15 +21,16 @@ class Response
     /**
      * Set a variable to use in template
      */
-    public function setVar($name, $value)
+    public function setVar($name, $value): self
     {
         $this->variables[$name] = $value;
+
+        return $this;
     }
 
     /**
      * Set many variables in one call.
      * @param array $values Associative array of variable key, value
-     * @return self
      */
     public function setVars(array $values): self
     {
@@ -101,17 +102,21 @@ class Response
     /**
      * Set the meta title for the page
      */
-    public function setTitle($title)
+    public function setTitle($title): self
     {
         $this->setVar('page_title', $title);
+
+        return $this;
     }
 
     /**
      * Set the meta description for the page
      */
-    public function setDescription($description)
+    public function setDescription($description): self
     {
         $this->setVar('page_description', $description);
+
+        return $this;
     }
 
     /**
@@ -136,9 +141,11 @@ class Response
     /**
      * Set the main body content
      */
-    public function setBody($output)
+    public function setBody($output): self
     {
         $this->body = $output;
+
+        return $this;
     }
 
     /**
@@ -161,9 +168,11 @@ class Response
      * Add a file to be included as a javascript file import
      * @param string $link
      */
-    public function addScript($link)
+    public function addScript($link): self
     {
         $this->scripts[] = $link;
+
+        return $this;
     }
 
     /**
@@ -184,9 +193,11 @@ class Response
      * Add a file to be included as a css file import
      * @param string $link
      */
-    public function addStylesheet($link)
+    public function addStylesheet($link): self
     {
         $this->stylesheets[] = $link;
+
+        return $this;
     }
 
     /**
@@ -232,9 +243,11 @@ class Response
     /**
      * Set a response header
      */
-    public function addHeader($name, $value)
+    public function addHeader($name, $value): self
     {
         header("{$name}: {$value}");
+
+        return $this;
     }
 
 }

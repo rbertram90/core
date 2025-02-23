@@ -6,7 +6,6 @@ use rbwebdesigns\macscomputers\App;
 
 /**
  * core/model/RBModel.php
- * @author: R Bertram <ricky@rbwebdesigns.co.uk>
  * 
  * This class provides the generic basic CRUD functionality for any /
  * every model under RBwebdesigns projects.
@@ -14,12 +13,12 @@ use rbwebdesigns\macscomputers\App;
  * The functions provide an interface to the database class - which can
  * be used directly but this way prevents having to repeat myself in the
  * different models.
- *   
+ * 
  * It also now sanitizes the values that are being inserted by using the
  * $fields array which needs to be set for each model. The key must match
  * the database field name and the value is the datatype - values as below.
- *   
- *   Example:
+ * 
+ * Example:
  *   $this->fields = array(
  *       'name' => 'string',
  *       'age' => 'number',
@@ -44,8 +43,10 @@ abstract class RBModel
 
     /**
      * Load an instance of the model by it's primary key.
+     * 
+     * False returned if could not find a match for the ID.
      */
-    public static function load(string|int $id): static
+    public static function load(string|int $id): static|false
     {
         /** @var \rbwebdesigns\core\ObjectDatabase */
         $db = App::container()->get('database');
