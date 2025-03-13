@@ -8,6 +8,9 @@
             "src/core-functions.php"
         ]
     },
+    "require": {
+        "psr/event-dispatcher": "^1.0"
+    },
     "require-dev": {
         "pestphp/pest": "^1.22"
     },
